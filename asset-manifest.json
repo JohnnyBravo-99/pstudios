@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/static/css/main.ccc3aa99.css",
-    "main.js": "/static/js/main.8e4b2302.js",
-    "static/js/453.933ad7a0.chunk.js": "/static/js/453.933ad7a0.chunk.js",
-    "static/media/PlayfairDisplay-VariableFont_wght.ttf": "/static/media/PlayfairDisplay-VariableFont_wght.bf46a6bcddc9999a295e.ttf",
-    "static/media/lp_logo.svg": "/static/media/lp_logo.f8b0958a33474b1a509f6448687bab48.svg",
-    "static/media/Beckan Regular.ttf": "/static/media/Beckan Regular.1bbe2e6f99fcddcf8b5e.ttf",
-    "index.html": "/index.html",
-    "main.ccc3aa99.css.map": "/static/css/main.ccc3aa99.css.map",
-    "main.8e4b2302.js.map": "/static/js/main.8e4b2302.js.map",
-    "453.933ad7a0.chunk.js.map": "/static/js/453.933ad7a0.chunk.js.map"
+    "main.css": "/JohnnyBravo-99/pstudios/static/css/main.05b24a53.css",
+    "main.js": "/JohnnyBravo-99/pstudios/static/js/main.d63e5a50.js",
+    "static/js/453.933ad7a0.chunk.js": "/JohnnyBravo-99/pstudios/static/js/453.933ad7a0.chunk.js",
+    "static/media/PlayfairDisplay-VariableFont_wght.ttf": "/JohnnyBravo-99/pstudios/static/media/PlayfairDisplay-VariableFont_wght.bf46a6bcddc9999a295e.ttf",
+    "static/media/lp_logo.svg": "/JohnnyBravo-99/pstudios/static/media/lp_logo.f8b0958a33474b1a509f6448687bab48.svg",
+    "static/media/Beckan Regular.ttf": "/JohnnyBravo-99/pstudios/static/media/Beckan Regular.1bbe2e6f99fcddcf8b5e.ttf",
+    "index.html": "/JohnnyBravo-99/pstudios/index.html",
+    "main.05b24a53.css.map": "/JohnnyBravo-99/pstudios/static/css/main.05b24a53.css.map",
+    "main.d63e5a50.js.map": "/JohnnyBravo-99/pstudios/static/js/main.d63e5a50.js.map",
+    "453.933ad7a0.chunk.js.map": "/JohnnyBravo-99/pstudios/static/js/453.933ad7a0.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.ccc3aa99.css",
-    "static/js/main.8e4b2302.js"
+    "static/css/main.05b24a53.css",
+    "static/js/main.d63e5a50.js"
   ]
 }
