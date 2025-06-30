@@ -2,9 +2,19 @@ import React, { useEffect, useState } from 'react';
 import './BackgroundVideo.css';
 
 
-function BackgroundVideo() {
-
+function BackgroundVideo({isVideoActive, onBack}) {
     const [active, setActive] = useState(false);
+    const [isFadingOut, setIsFadingOut] = useState(false);
+
+    const handleFadeout = () => {
+
+        setIsFadingOut(true);
+
+        setTimeout(() => {
+            if(onBack) onBack();
+        }, 1500);
+
+    }
 
     useEffect(() => {
         const timeout = setTimeout(() =>{setActive(true);}, 50);
@@ -13,7 +23,7 @@ function BackgroundVideo() {
     }, []);
 
     return (
-        <div className={`video-container ${active ? 'active' : ''}`}>
+        <div className={`video-container ${active ? 'active' : ''} ${isFadingOut ? 'fade-out' : ''}`}>
             
                 <video 
                 /*ref={videoRef}*/
@@ -26,7 +36,7 @@ function BackgroundVideo() {
                     <source src="/bg-video.mp4" type="video/mp4" />
                     Your browser does not support HTML5 video
                 </video>
-            
+            <div className="backBtn" onClick={handleFadeout}> Home </div>
                 <div className="centered-div">
                     <h1>We Are Paradigm Studios</h1>
                     <p>

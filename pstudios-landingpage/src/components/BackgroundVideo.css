@@ -14,6 +14,12 @@
 
 }
 
+.fade-out {
+
+  opacity: 0 !important;
+  transition: opacity 1.5s ease-in-out;
+}
+
 .video-container {
   position: fixed;
   top: 0;
@@ -62,7 +68,8 @@
   z-index: 10;
   width: 25rem;
   padding: 1rem;
-  
+  display: flex; 
+  flex-direction: column;
   background-color:#0066995d;
   
 
@@ -120,7 +127,7 @@ all: unset;
   cursor: pointer;
   font-size: clamp(1rem, 1vh, 1vw);
   
-  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  transition: background-color 0.5Ws ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
 
 
 }
@@ -136,13 +143,43 @@ all: unset;
 
 
 
+.backBtn {
+
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  padding: .25rem;
+  display: flex;
+
+  background:none;
+  user-select: none;
+  color: #ff9933;
+  font-size: large;
+  z-index: 1;
+  cursor: pointer;
+  font-family: 'Beckan';
+  font-size: 1.5rem;
+}
 
 
+@media (max-width: 768px){
+
+  .backBtn {
+    top:1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    padding: 0.5rem 1rem;
+    background-color: rgba(0,0,0,0.3);
+    border-radius:0.5rem;
+    backdrop-filter: blur(4px);
+
+  }
+}
 
 .centered-div * {
 
-  padding: 1rem;
-  
+  padding: 1vh;
   
 }
 

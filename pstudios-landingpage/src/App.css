@@ -19,27 +19,11 @@
   height: 100vh;
   overflow: hidden;
   padding: 1rem;
-
   text-align: center;
   align-items: center;
   user-select: none;
 }
 
-.backBtn {
-
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  padding: 1rem;
-  background:none;
-  user-select: none;
-  color: #ff9933;
-  font-size: large;
-  z-index: 10;
-  cursor: pointer;
-  font-family: 'Beckan';
-  font-size: xx-large;
-}
 
 .Lp-logo-container {
 
@@ -77,7 +61,18 @@
 }
 
 
+.fade-in {
 
+opacity:0;
+animation: fadeInAnim  1.5s ease forwards;
+
+}
+
+@keyframes fadeInAnim {
+  to {
+    opacity:1;
+  }
+}
 
 .App-logo {
 
@@ -85,7 +80,7 @@
   width: clamp( 320px, 80vw, 1024px);
   height: auto;
   cursor: pointer;
-
+  
   user-select: none;        /* Prevent text selection */
   outline: none;            /* Remove blue outline on focus */
   -webkit-user-select: none;
@@ -126,5 +121,12 @@
 
   display: flex;
   padding: 1rem
-
 }
+
+  .centered-div {
+
+    transform: translate(-50%, -40%);
+    padding-top: 2rem;
+
+  }
+

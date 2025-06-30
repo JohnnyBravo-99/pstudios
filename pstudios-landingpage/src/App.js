@@ -8,18 +8,35 @@ function App() {
   
   const [showImage, setShowImage] = useState(true);
   const [isVideoActive, setIsVideoActive] = useState(false);
+  const [fadeInLogo, setFadeInLogo] = useState(false);
 
-  const handleImageClick = () => {
-    setShowImage(prev => !prev);
-    setIsVideoActive(prev => !prev);
-  };
+
+const handleImageClick = () => {
+  if (showImage) {
+    // Clicked logo to enter video mode
+    setShowImage(false);
+    setIsVideoActive(true);
+  } else {
+    // Clicked "Home" to return
+    setIsVideoActive(false);
+
+    setTimeout(() => {
+      setShowImage(true);
+      setFadeInLogo(true);
+    }, 100);
+
+    setTimeout(() => {
+      setFadeInLogo(false);
+    }, 1600);
+  }
+};
 
   return (
 
       
         <div className="Lp-logo-container" tabIndex={-1}>
           {showImage ? (
-            <div className="App" onClick={handleImageClick} tabIndex={-1}>
+            <div className={`App ${fadeInLogo ? 'fade-in' : ''}`} tabIndex={-1}>
 
               <img src={logo} 
 
@@ -31,19 +48,15 @@ function App() {
               playsInLine
               disabledPictureInPicture
               controls={false}
+              onClick={handleImageClick}
               />
 
             </div>
           ) : (
 
             <div className="Lp-logo-container" >
-
-              <div className="backBtn" onClick={handleImageClick}> Home </div>
-
-              <BackgroundVideo isVideoActive={isVideoActive}/>
-
+              <BackgroundVideo isVideoActive={isVideoActive} onBack={handleImageClick}/>
             </div>
-
           )}
         </div>
   );
