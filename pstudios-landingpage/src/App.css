@@ -1,42 +1,95 @@
+@font-face {
+  font-family: 'Beckan';
+  src: url('./assets/fonts/Beckan\ Regular.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face { 
+
+  font-family: 'Playfair-Display';
+  src: url('./assets/fonts/PlayfairDisplay-VariableFont_wght.ttf');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
 .App {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  padding: 1rem;
+
   text-align: center;
   align-items: center;
+  user-select: none;
+}
+
+.backBtn {
+
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  padding: 1rem;
+  background:none;
+  user-select: none;
+  color: #ff9933;
+  font-size: large;
+  z-index: 10;
+  cursor: pointer;
+  font-family: 'Beckan';
+  font-size: xx-large;
 }
 
 .Lp-logo-container {
 
 
   
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: flex;
-  position:fixed;
+  flex-direction:column;
+  padding: 2rem;
   justify-content: center;
   align-items: center;
+  box-sizing: border-box;
   
 
 
 }
 
-.contact-info {
-
-  width: 500px;
-  height: 500px;
-  display: flex;
-  flex-direction:row;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  overflow: hidden;
-  
-
+@media (max-width: 768px) {
+  .App-logo {
+    max-width: 400px;
+  }
 }
+
+@media (max-width: 768px) {
+  .App-logo {
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 1920px) {
+  .App-logo {
+    max-width: 1024px;
+  }
+}
+
+
+
 
 .App-logo {
 
-  width: 1024px;
-  height:100%;
-  pointer-events: none;
+
+  width: clamp( 320px, 80vw, 1024px);
+  height: auto;
+  cursor: pointer;
+
+  user-select: none;        /* Prevent text selection */
+  outline: none;            /* Remove blue outline on focus */
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 
 /*@media (prefers-reduced-motion: no-preference) {
@@ -46,7 +99,7 @@
 }*/
 
 .App-header {
-  background-color: #282c34;
+  background-color: #ff9933;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -67,4 +120,11 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.emailBadge {
+
+  display: flex;
+  padding: 1rem
+
 }
