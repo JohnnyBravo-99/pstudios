@@ -23,6 +23,8 @@ function BackgroundVideo({isVideoActive, onBack}) {
     }, []);
 
     return (
+        <>
+    
         <div className={`video-container ${active ? 'active' : ''} ${isFadingOut ? 'fade-out' : ''}`}>
             
                 <video 
@@ -32,12 +34,21 @@ function BackgroundVideo({isVideoActive, onBack}) {
                 loop
                 muted
                 playsInline
+                controls={false}
+                draggable={false}
                 >
                     <source src="/bg-video.mp4" type="video/mp4" />
                     Your browser does not support HTML5 video
                 </video>
-            <div className="backBtn" onClick={handleFadeout}> Home </div>
+            
+                
+
                 <div className="centered-div">
+
+                        <div className="backWrapper">
+                            <div className="backBtn" onClick={handleFadeout}> <h3>Home</h3> </div>
+                        </div>
+
                     <h1>We Are Paradigm Studios</h1>
                     <p>
                             This isn’t the full site — but it’s not empty either. 
@@ -62,6 +73,8 @@ function BackgroundVideo({isVideoActive, onBack}) {
                     </div>
                 </div>
             </div>
+            </>
+            
     )
 }
 

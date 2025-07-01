@@ -43,11 +43,7 @@ const handleImageClick = () => {
               className="App-logo" 
               alt="logo" 
               tabIndex={-1} 
-              draggable={false}
               reload="auto"
-              playsInLine
-              disabledPictureInPicture
-              controls={false}
               onClick={handleImageClick}
               />
 

@@ -20,8 +20,11 @@
   transition: opacity 1.5s ease-in-out;
 }
 
+
+
 .video-container {
   position: fixed;
+  align-items: flex-start;
   top: 0;
   left: 0;
   width: 100vw;
@@ -33,7 +36,7 @@
   filter: blur(8px);
   display: flex;
   justify-content: center;
-  align-items: center;
+  overflow-y: auto;
 
 }
 
@@ -57,21 +60,82 @@
   touch-action: none;
 }
 
+@media (max-width: 768px) {
+
+  .centered-div {
+    position: static;
+    transform: none;
+    width: 95vw;
+    max-width: 28rem;
+    background-color: #0066995d;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    overflow-y: auto;
+    padding: 1.25rem;
+  }
+
+  .centered-div h1,
+  .centered-div h2 {
+    all: unset;
+    font-family: 'Beckan';
+    font-weight: 100;
+    font-size: clamp(1.25rem, 3vw, 2rem);
+    color: #ff9933;
+  }
+
+  .video-container {
+    overflow-y: auto;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding-top: 2rem;
+  }
+
+  .backWrapper {
+    margin-bottom: 1rem;
+    padding: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .backBtn {
+    padding: 0.4rem 1.25rem;
+    line-height: 1.2;
+    width: auto;
+    font-size: 1.2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #006699;
+    border-radius: 0.5rem;
+    backdrop-filter: blur(4px);
+    color: #ff9933;
+    font-family: 'Beckan';
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+
+
+}
+
 .centered-div {
 
   all: unset;
   user-select: none;
-  position: absolute;
+  position: static;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   z-index: 10;
   width: 25rem;
   padding: 1rem;
   display: flex; 
   flex-direction: column;
   background-color:#0066995d;
-  
+  box-sizing:border-box;
 
   border-radius: 12px;
   color: white;
@@ -100,6 +164,7 @@ color: #ff9933;
   color: #ff9933;
   display: flex;
   justify-content: center;
+  
 
   
 }
@@ -114,18 +179,19 @@ color: #ff9933;
 
 .emailBadge {
 
-all: unset;
+  all: unset;
   border-radius: 1rem;
   background-color: #006699;
   margin-top: 1rem;
   font-family: 'Playfair-Display';
   display: flex;
   height: 5vh; 
-  width: 30vh;
+  width: 40vh;
   justify-content:center;
   align-items: center;
   cursor: pointer;
-  font-size: clamp(1rem, 1vh, 1vw);
+  font-size: clamp(1.25rem, 1vh, 1vw);
+  
   
   transition: background-color 0.5Ws ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
 
@@ -141,45 +207,48 @@ all: unset;
 
 }
 
+.backWrapper {
+  
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
 
+  
+
+}
 
 .backBtn {
-
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  padding: .25rem;
-  display: flex;
-
-  background:none;
-  user-select: none;
+  padding: 0rem;
+  line-height: .1;
+  height: auto;
+  width: 5rem;
+  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #006699;
+  border-radius: 0.5rem;
+  backdrop-filter: blur(4px);
   color: #ff9933;
-  font-size: large;
-  z-index: 1;
-  cursor: pointer;
   font-family: 'Beckan';
-  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 1; 
 }
 
+.backBtn:hover {
 
-@media (max-width: 768px){
+  background-color: #ff9933;
+  color: #006699;
+  box-shadow: #ff9933 0px 30px 60px -20px, rgba(0, 0, 0, 0.85) 0px 30px 60px -30px;
 
-  .backBtn {
-    top:1rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 20;
-    padding: 0.5rem 1rem;
-    background-color: rgba(0,0,0,0.3);
-    border-radius:0.5rem;
-    backdrop-filter: blur(4px);
-
-  }
 }
+
 
 .centered-div * {
 
-  padding: 1vh;
+  padding: .5vh;
   
 }
 
