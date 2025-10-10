@@ -74,6 +74,11 @@ animation: fadeInAnim  1.5s ease forwards;
   }
 }
 
+.fade-out-logo {
+  opacity: 0 !important;
+  transition: opacity 1.5s ease-in-out;
+}
+
 .App-logo {
 
 
