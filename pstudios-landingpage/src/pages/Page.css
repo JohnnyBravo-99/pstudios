@@ -111,17 +111,18 @@
 }
 
 /* Background styling for pages without video */
-.about-page,
 .portfolio-page,
 .contact-page {
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
 }
 
-/* Home page specific - allows video background to show through */
-.home-page {
+/* Pages with video background - allows video to show through */
+.home-page,
+.about-page {
   background: transparent;
 }
 
-.home-page .page-content {
+.home-page .page-content,
+.about-page .page-content {
   margin-top: 2rem;
 }

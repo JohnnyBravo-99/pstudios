@@ -1,10 +1,12 @@
 import React from 'react';
+import BackgroundVideo from '../components/BackgroundVideo';
 import './Page.css';
 
 function About() {
   return (
     <div className="page-container about-page">
-      <div className="page-content">
+      <BackgroundVideo isVideoActive={true} />
+      <div className="page-content overlay-content">
         <h1 className="page-title">About Paradigm Studios</h1>
         <div className="content-section">
           <p className="page-description">
