@@ -24,24 +24,18 @@
 
 .video-container {
   position: fixed;
-  align-items: flex-start;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  z-index: -1; /* Behind main content unless toggled */
+  z-index: -1;
   opacity: 0;
-  transition: opacity 3s ease-in-out, filter 3s ease-out;
+  transition: opacity 2s ease-in-out, filter 2s ease-out;
   filter: blur(8px);
-  display: flex;
-  justify-content: center;
-  overflow-y: auto;
-
 }
 
 .video-container.active {
-  z-index: 0;
   opacity: 1;
   filter: blur(0);
 }
