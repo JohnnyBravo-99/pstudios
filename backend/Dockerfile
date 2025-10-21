@@ -10,6 +10,7 @@ RUN npm ci --only=production
 
 # Copy source code
 COPY src/ ./src/
+COPY scripts/ ./scripts/
 
 # Create uploads directory
 RUN mkdir -p uploads
