@@ -1,0 +1,15 @@
+# Replace 'api.example.com' with your actual domain
+# Example: api.yourdomain.com
+api.example.com {
+    reverse_proxy localhost:3000
+    encode gzip zstd
+    log {
+      output file /var/log/caddy/api_access.log
+      format single_field common_log
+    }
+}
+
+# Optional: MongoDB admin interface (secure this!)
+# admin.example.com {
+#   reverse_proxy localhost:8081
+# }
