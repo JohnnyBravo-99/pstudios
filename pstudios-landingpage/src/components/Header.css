@@ -1,0 +1,176 @@
+.main-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  /* Dark gray radial gradient with lighter corners */
+  background: radial-gradient(ellipse at center, #cccccc 0%, #999999 70%, #676767 100%);
+  /* Accent blue glow on outside-bottom edge */
+  box-shadow: 0 2px 8px lab(16.59% 0 0 / 0.4), 0 4px 16px rgba(51, 153, 204, 0.3), 0 8px 32px rgba(51, 153, 204, 0.2);
+  /* Removed backdrop-filter to prevent text blur */
+  z-index: 1000;
+  border-bottom: 1px solid rgba(51, 153, 204, 0.3);
+}
+
+.nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-section {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* Space between logo and text */
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* Space between logo image and text */
+  color: #ffffff;
+  text-decoration: none;
+  font-size: var(--fs-2);
+  font-weight: 600;
+  letter-spacing: 0.02em; /* Slight tracking */
+  transition: color 0.3s ease, opacity 0.3s ease;
+  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-feature-settings: "kern" 1, "liga" 1;
+  text-rendering: optimizeLegibility;
+  font-family: 'Beckan', sans-serif; /* Use Beckan font */
+}
+
+.logo-link:hover {
+  color: #cccccc;
+}
+
+.header-vertical-logo {
+  width: auto;
+  height: 40px; /* Compact stacked logo height */
+  display: block;
+  object-fit: contain;
+  transition: opacity 0.3s ease;
+}
+
+.header-vertical-logo:hover {
+  opacity: 1;
+}
+
+/* Removed textual logo composition in favor of stacked SVG */
+
+/* Individual logo parts */
+.logo-paradigm {
+  font-family: 'Beckan', sans-serif;
+  color: var(--color-secondary);
+  font-size: var(--fs-2); /* ≈22.7px from 14px base */
+  letter-spacing: 0.05em; /* More dramatic tracking to prevent letters touching */
+  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-feature-settings: "kern" 1, "liga" 1;
+  text-rendering: optimizeLegibility;
+  /* Ensure precise color matching */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.logo-studios {
+  font-family: 'Beckan', sans-serif;
+  color: var(--color-secondary);
+  font-size: var(--fs-2); /* ≈22.7px from 14px base */
+  letter-spacing: 0.05em; /* More dramatic tracking to prevent letters touching */
+  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-feature-settings: "kern" 1, "liga" 1;
+  text-rendering: optimizeLegibility;
+  /* Ensure precise color matching */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  gap: 2.5rem;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.nav-item {
+  position: relative;
+}
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.5rem 0;
+  transition: color 0.3s ease;
+  position: relative;
+  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-feature-settings: "kern" 1, "liga" 1;
+  text-rendering: optimizeLegibility;
+}
+
+.nav-link:hover {
+  color: #ffffff;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 3px; /* Slightly thicker for better visibility */
+  background: #4db8ff; /* Brighter, more visible blue */
+  box-shadow: 0 0 8px rgba(77, 184, 255, 0.6); /* Matching bright blue glow */
+  transition: width 0.3s ease, box-shadow 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+  box-shadow: 0 0 15px rgba(77, 184, 255, 0.8); /* Enhanced bright blue glow on hover */
+}
+
+.nav-item.active .nav-link {
+  color: #ffffff;
+}
+
+.nav-item.active .nav-link::after {
+  width: 100%;
+  box-shadow: 0 0 15px rgba(77, 184, 255, 0.8); /* Enhanced bright blue glow for active state */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .nav-container {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+
+  .nav-menu {
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .logo-link {
+    font-size: 1.25rem;
+    gap: 0.5rem; /* Reduce gap on mobile */
+  }
+
+  .header-logo-image {
+    width: 28px; /* Slightly smaller on mobile */
+    height: 28px;
+  }
+
+  .nav-link {
+    font-size: 0.9rem;
+  }
+}
