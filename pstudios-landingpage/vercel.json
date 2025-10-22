@@ -1,4 +1,8 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "build",
+  "framework": "create-react-app",
+  "installCommand": "npm install",
   "headers": [
     {
       "source": "/fonts/(.*).woff2",
@@ -91,6 +95,12 @@
           "value": "</static/media/Beckan Regular.woff2>; rel=preload; as=font; type=font/woff2; crossorigin=anonymous, </static/media/Beckan Oblique.woff2>; rel=preload; as=font; type=font/woff2; crossorigin=anonymous"
         }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
     }
   ]
 }
