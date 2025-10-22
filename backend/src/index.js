@@ -31,10 +31,13 @@ app.use('/api/', limiter);
 app.use(cors({
   origin: [
     process.env.CLIENT_ORIGIN || 'http://localhost:3000',
+    process.env.GITHUB_PAGES_URL || 'https://johnnybravo-99.github.io/pstudios',
     'https://johnnybravo-99.github.io',
     'https://johnnybravo-99.github.io/pstudios'
   ],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 // Body parsing middleware
@@ -61,7 +64,32 @@ app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV,
+    allowedOrigins: [
+      process.env.CLIENT_ORIGIN,
+      process.env.GITHUB_PAGES_URL,
+      'https://johnnybravo-99.github.io',
+      'https://johnnybravo-99.github.io/pstudios'
+    ]
+  });
+});
+
+// GitHub Pages integration endpoint
+app.get('/api/github-pages-info', (req, res) => {
+  res.json({
+    message: 'Backend ready for GitHub Pages integration',
+    apiBaseUrl: `${req.protocol}://${req.get('host')}/api`,
+    allowedOrigins: [
+      'https://johnnybravo-99.github.io',
+      'https://johnnybravo-99.github.io/pstudios'
+    ],
+    endpoints: {
+      auth: '/api/auth',
+      portfolio: '/api/portfolio',
+      admin: '/api/admin',
+      health: '/api/health'
+    }
   });
 });
 
