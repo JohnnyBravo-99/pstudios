@@ -1,4 +1,4 @@
-# MERN VPS Deployment
+# Paradigm Studios - MERN Stack Application
 
 ## ✅ COMPLETED SETUP STATUS
 - **Environment Variables**: ✅ Configured with secure passwords
@@ -10,26 +10,40 @@
 
 ## Directory Structure
 ```
-/home/jay_gatsby/mernvps/
-├── README.md                           # This file
-├── SETUP_GUIDE.md                      # Detailed setup instructions
-├── DEPLOYMENT_CHECKLIST.md             # Step-by-step verification
-├── MERN_VPS_Deployment_Plan.md        # Complete deployment plan
-├── manual_setup_commands.md            # Commands to run with sudo
-├── docker-compose.yml                  # Main application stack
-├── envs/
-│   └── api.env                         # Environment variables (SECURE PASSWORDS SET)
-├── scripts/
-│   ├── complete_setup.sh               # One-command system setup
-│   ├── setup_vps.sh                    # Automated setup script
-│   └── mongo_backup.sh                 # Backup script
-├── configs/
-│   ├── Caddyfile                       # Caddy reverse proxy config (DOMAIN TEMPLATE)
-│   ├── express_cors_config.js          # CORS configuration
-│   └── github_actions_workflow.yml     # CI/CD pipeline
-├── logs/
-│   └── api/                            # Application logs
-└── backups/                            # Local backup storage
+pstudios/
+├── backend/                            # Express.js API server
+│   ├── src/                           # API source code
+│   ├── configs/                       # Caddy, CORS configs
+│   ├── scripts/                       # Setup and seed scripts
+│   ├── envs/                          # Environment variables
+│   ├── docker-compose.yml             # Docker orchestration
+│   └── Dockerfile                     # API container
+├── pstudios-landingpage/              # React frontend
+│   ├── src/                          # React components
+│   │   ├── admin/                    # Admin panel components
+│   │   ├── pages/                    # Public pages
+│   │   ├── components/               # Reusable components
+│   │   ├── styles/                   # CSS styles
+│   │   └── config/                   # Configuration files
+│   ├── public/                       # Static assets
+│   └── build/                        # Production build
+└── README.md
+```
+
+## 🚀 Quick Start
+
+### Development
+```bash
+# Install dependencies and start both servers
+./start-dev.bat  # Windows
+# or
+./start-dev.ps1  # PowerShell
+```
+
+### Production Deployment
+```bash
+# Deploy to VPS
+sudo bash backend/scripts/complete_setup.sh
 ```
 
 ## 🚀 NEXT STEPS (When You Return)
@@ -83,3 +97,17 @@ curl https://your-domain.com/api/health
 - **Logout/Login**: Required after setup to get Docker group permissions
 - **Backups**: Automated daily backups configured
 - **Monitoring**: Use DEPLOYMENT_CHECKLIST.md for verification steps
+
+## 🔧 Admin Panel Access
+
+### Development
+- **Admin Panel**: `http://localhost:3000/cp-admin`
+- **Direct Login**: `http://localhost:3000/login`
+
+### Production
+- **Main Site**: `https://paradigmstudios.art`
+- **Admin Panel**: `https://paradigmstudios.art/cp-admin`
+
+## 🚀 Deployment
+
+The application is configured for both GitHub Pages (frontend) and VPS deployment (backend). See the deployment guides in the backend directory for production setup.
