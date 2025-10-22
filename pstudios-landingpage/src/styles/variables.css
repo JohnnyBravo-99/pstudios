@@ -1,0 +1,480 @@
+/* ========================================
+   PARADIGM STUDIOS - DESIGN SYSTEM
+   Master CSS Variables & Global Styles
+   ======================================== */
+
+/* ========================================
+   FONTS
+   ======================================== */
+
+/* Beckan Regular - Hinted WOFF2 with proper weight/style matching */
+@font-face {
+  font-family: 'Beckan';
+  src: url('../assets/fonts/Beckan Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Playfair Display - Variable Font */
+@font-face { 
+  font-family: 'Playfair-Display';
+  src: url('../assets/fonts/PlayfairDisplay-VariableFont_wght.ttf') format('truetype');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ========================================
+   CSS CUSTOM PROPERTIES (VARIABLES)
+   ======================================== */
+:root {
+  /* ===== COLOR PALETTE ===== */
+  
+  /* Primary Brand Colors (from branding guide) */
+  --color-primary: #006699;        /* Primary Blue */
+  --color-secondary: #ffab3d;      /* Secondary Orange - matches logo exactly */
+  --color-accent: #3399cc;         /* Accent Blue */
+  
+  /* Legacy aliases for compatibility */
+  --color-primary-blue: #006699;
+  --color-primary-orange: #ffab3d; /* Matches logo exactly */
+  
+  /* Graphite Veil Gray & Neutrals (from branding guide) */
+  --color-graphite-veil: #676767;
+  --color-graphite-dark: #4a4a4a;
+  --color-graphite-light: #8a8a8a;
+  --color-graphite-ultra-light: #b8b8b8;
+  
+  /* Base Colors */
+  --color-black: #000000;
+  --color-dark-gray: #2a2a2a;
+  --color-medium-gray: #676767;  /* Same as graphite veil */
+  --color-light-gray: #cccccc;
+  --color-white: #ffffff;
+  
+  /* Brand Color Transparency Variations */
+  --color-primary-transparent-10: rgba(0, 102, 153, 0.1);
+  --color-primary-transparent-20: rgba(0, 102, 153, 0.2);
+  --color-primary-transparent-40: rgba(0, 102, 153, 0.4);
+  --color-primary-transparent-60: rgba(0, 102, 153, 0.6);
+  --color-primary-transparent-80: rgba(0, 102, 153, 0.8);
+  --color-primary-transparent-90: rgba(0, 102, 153, 0.9);
+  
+  --color-secondary-transparent-10: rgba(255, 153, 0, 0.1);
+  --color-secondary-transparent-20: rgba(255, 153, 0, 0.2);
+  --color-secondary-transparent-40: rgba(255, 153, 0, 0.4);
+  --color-secondary-transparent-60: rgba(255, 153, 0, 0.6);
+  --color-secondary-transparent-80: rgba(255, 153, 0, 0.8);
+  --color-secondary-transparent-90: rgba(255, 153, 0, 0.9);
+  
+  --color-accent-transparent-10: rgba(51, 153, 204, 0.1);
+  --color-accent-transparent-20: rgba(51, 153, 204, 0.2);
+  --color-accent-transparent-40: rgba(51, 153, 204, 0.4);
+  --color-accent-transparent-60: rgba(51, 153, 204, 0.6);
+  --color-accent-transparent-80: rgba(51, 153, 204, 0.8);
+  --color-accent-transparent-90: rgba(51, 153, 204, 0.9);
+  
+  /* Legacy transparency variations */
+  --color-blue-transparent-10: rgba(0, 102, 153, 0.1);
+  --color-blue-transparent-36: rgba(0, 102, 153, 0.36);
+  --color-blue-transparent-60: rgba(0, 102, 153, 0.6);
+  --color-black-transparent-60: rgba(0, 0, 0, 0.6);
+  --color-black-transparent-90: rgba(0, 0, 0, 0.9);
+  --color-white-transparent-05: rgba(255, 255, 255, 0.05);
+  --color-white-transparent-10: rgba(255, 255, 255, 0.1);
+  --color-white-transparent-15: rgba(255, 255, 255, 0.15);
+  --color-white-transparent-20: rgba(255, 255, 255, 0.2);
+  --color-white-transparent-80: rgba(255, 255, 255, 0.8);
+  --color-white-transparent-90: rgba(255, 255, 255, 0.9);
+  
+  /* Graphite Veil Transparency Variations */
+  --color-graphite-transparent-10: rgba(103, 103, 103, 0.1);
+  --color-graphite-transparent-20: rgba(103, 103, 103, 0.2);
+  --color-graphite-transparent-40: rgba(103, 103, 103, 0.4);
+  --color-graphite-transparent-60: rgba(103, 103, 103, 0.6);
+  --color-graphite-transparent-80: rgba(103, 103, 103, 0.8);
+  --color-graphite-transparent-90: rgba(103, 103, 103, 0.9);
+  
+  /* ===== TYPOGRAPHY ===== */
+  
+  /* Font Families */
+  --font-primary: 'Beckan', sans-serif;
+  --font-secondary: 'Playfair-Display', serif;
+  --font-fallback: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  
+  /* Golden ratio modular scale (base 14px) */
+  --phi: 1.618;
+  --scale-base: 0.875rem; /* 14px */
+  --fs--1: calc(var(--scale-base) / var(--phi));
+  --fs-0:  var(--scale-base);
+  --fs-1:  calc(var(--scale-base) * var(--phi));
+  --fs-2:  calc(var(--fs-1) * var(--phi));
+  --fs-3:  calc(var(--fs-2) * var(--phi));
+  --fs-4:  calc(var(--fs-3) * var(--phi));
+  /* Responsive variants (gentle growth) */
+  --fs-1-r: clamp(calc(var(--fs-1) * 0.95), 1.2vw, var(--fs-2));
+  --fs-2-r: clamp(calc(var(--fs-2) * 0.95), 2.2vw, var(--fs-3));
+  --fs-3-r: clamp(calc(var(--fs-3) * 0.95), 3.5vw, var(--fs-4));
+  
+  /* Font Weights */
+  --font-weight-thin: 100;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Font Sizes */
+  --font-size-xs: 0.75rem;      /* 12px */
+  --font-size-sm: 0.875rem;     /* 14px */
+  --font-size-base: 1rem;       /* 16px */
+  --font-size-lg: 1.125rem;     /* 18px */
+  --font-size-xl: 1.25rem;      /* 20px */
+  --font-size-2xl: 1.5rem;      /* 24px */
+  --font-size-3xl: 1.875rem;    /* 30px */
+  --font-size-4xl: 2.25rem;     /* 36px */
+  --font-size-5xl: 3rem;        /* 48px */
+  --font-size-6xl: 4rem;        /* 64px */
+  
+  /* Responsive Font Sizes (using clamp) */
+  --font-size-responsive-sm: clamp(0.875rem, 1vw, 1rem);
+  --font-size-responsive-md: clamp(1rem, 2vw, 1.3rem);
+  --font-size-responsive-lg: clamp(1.25rem, 3vw, 2rem);
+  --font-size-responsive-xl: clamp(2rem, 5vw, 4rem);
+  
+  /* Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.8;
+  --line-height-loose: 2;
+  
+  /* Letter Spacing / Tracking */
+  --letter-spacing-tight: -0.5px;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.5px;
+  --letter-spacing-heading: 0.02em;  /* Slight tracking for headings */
+  --letter-spacing-heading-large: 0.01em;  /* Less tracking for larger headings */
+  
+  /* ===== SPACING ===== */
+  --spacing-xs: 0.25rem;    /* 4px */
+  --spacing-sm: 0.5rem;     /* 8px */
+  --spacing-md: 1rem;       /* 16px */
+  --spacing-lg: 1.5rem;     /* 24px */
+  --spacing-xl: 2rem;       /* 32px */
+  --spacing-2xl: 3rem;      /* 48px */
+  --spacing-3xl: 4rem;      /* 64px */
+  --spacing-4xl: 6rem;      /* 96px */
+  
+  /* ===== LAYOUT ===== */
+  --max-width-sm: 640px;
+  --max-width-md: 768px;
+  --max-width-lg: 1024px;
+  --max-width-xl: 1200px;
+  --max-width-2xl: 1400px;
+  --max-width-content: 900px;
+  
+  /* Header */
+  --header-height: 80px;
+  --header-height-mobile: 140px;
+  
+  /* ===== BORDERS ===== */
+  --border-radius-sm: 0.5rem;   /* 8px */
+  --border-radius-md: 0.75rem;  /* 12px */
+  --border-radius-lg: 1rem;     /* 16px */
+  --border-radius-xl: 1.5rem;   /* 24px */
+  
+  --border-width-thin: 1px;
+  --border-width-medium: 2px;
+  --border-width-thick: 4px;
+  
+  /* ===== SHADOWS ===== */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.5);
+  
+  /* Brand color shadows */
+  --shadow-primary: 0 4px 12px var(--color-primary-transparent-40);
+  --shadow-secondary: 0 4px 12px var(--color-secondary-transparent-40);
+  --shadow-accent: 0 4px 12px var(--color-accent-transparent-40);
+  --shadow-primary-glow: 0 30px 60px -20px var(--color-primary);
+  --shadow-secondary-glow: 0 30px 60px -20px var(--color-secondary);
+  --shadow-accent-glow: 0 30px 60px -20px var(--color-accent);
+  
+  /* Legacy shadows */
+  --shadow-glow-orange: 0 30px 60px -20px var(--color-secondary);
+  --shadow-glow-combined: var(--color-secondary) 0px 30px 60px -20px, rgba(0, 0, 0, 0.85) 0px 30px 60px -30px;
+  
+  /* Graphite-based shadows */
+  --shadow-graphite-sm: 0 1px 2px rgba(103, 103, 103, 0.1);
+  --shadow-graphite-md: 0 4px 6px rgba(103, 103, 103, 0.2);
+  --shadow-graphite-lg: 0 8px 32px rgba(103, 103, 103, 0.3);
+  --shadow-graphite-xl: 0 20px 60px rgba(103, 103, 103, 0.4);
+  
+  /* ===== TRANSITIONS ===== */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  --transition-slower: 1s ease;
+  --transition-fade: 1.5s ease-in-out;
+  --transition-fade-slow: 2s ease-in-out;
+  
+  /* ===== Z-INDEX SCALE ===== */
+  --z-index-below: -1;
+  --z-index-base: 0;
+  --z-index-content: 1;
+  --z-index-content-high: 100;
+  --z-index-header: 1000;
+  --z-index-overlay: 9000;
+  --z-index-modal: 9500;
+  --z-index-landing: 10000;
+  
+  /* ===== FILTERS & EFFECTS ===== */
+  --blur-sm: blur(4px);
+  --blur-md: blur(8px);
+  --blur-lg: blur(10px);
+  --brightness-dim: brightness(0.5);
+  --brightness-normal: brightness(1);
+  
+  /* ===== BREAKPOINTS (for media queries) ===== */
+  /* Use these in @media queries like: @media (max-width: 768px) */
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+/* ========================================
+   GLOBAL RESETS & DEFAULTS
+   ======================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;   /* helps on WebKit */
+  text-rendering: optimizeLegibility;    /* enables kerning/ligatures */
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-secondary);
+  color: var(--color-white);
+  background: linear-gradient(135deg, #4a4a4a 0%, #676767 50%, #8a8a8a 100%);
+  line-height: var(--line-height-normal);
+  overflow-x: hidden;
+  /* Enable kerning and ligatures globally */
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  -webkit-font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  -moz-font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+}
+
+/* ========================================
+   TYPOGRAPHY UTILITY CLASSES
+   ======================================== */
+
+.font-primary {
+  font-family: var(--font-primary);
+  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-feature-settings: "kern" 1, "liga" 1;
+  font-kerning: normal;
+  /* Enhanced smoothing for Beckan font - using antialiased for precise color matching */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-smooth: always;
+}
+
+.font-secondary {
+  font-family: var(--font-secondary);
+  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-feature-settings: "kern" 1, "liga" 1;
+  font-kerning: normal;
+}
+
+.text-primary {
+  color: var(--color-primary);
+}
+
+.text-secondary {
+  color: var(--color-secondary);
+}
+
+.text-accent {
+  color: var(--color-accent);
+}
+
+.text-white {
+  color: var(--color-white);
+}
+
+/* Legacy aliases */
+.text-primary-blue {
+  color: var(--color-primary);
+}
+
+.text-primary-orange {
+  color: var(--color-secondary);
+}
+
+/* Heading Typography with Tracking */
+h1, h2, h3, h4, h5, h6,
+.heading-style {
+  letter-spacing: var(--letter-spacing-heading);
+  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-feature-settings: "kern" 1, "liga" 1;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+  /* Enhanced smoothing for headings to remove jagged edges */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: always;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+h1, .h1-style {
+  letter-spacing: var(--letter-spacing-heading-large);
+}
+
+/* Prevent text blurring from transforms */
+.text-crisp,
+h1, h2, h3, h4, h5, h6, p, a, span {
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-perspective: 1000;
+  perspective: 1000;
+}
+
+/* ========================================
+   BACKGROUND GRADIENTS
+   ======================================== */
+
+.bg-gradient-dark {
+  background: linear-gradient(135deg, var(--color-dark-gray) 0%, var(--color-medium-gray) 100%);
+}
+
+.bg-gradient-graphite {
+  background: linear-gradient(135deg, var(--color-graphite-dark) 0%, var(--color-graphite-veil) 50%, var(--color-graphite-light) 100%);
+}
+
+.bg-gradient-graphite-subtle {
+  background: linear-gradient(135deg, var(--color-graphite-veil) 0%, var(--color-graphite-light) 100%);
+}
+
+.bg-graphite-veil {
+  background-color: var(--color-graphite-veil);
+}
+
+.bg-graphite-dark {
+  background-color: var(--color-graphite-dark);
+}
+
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.bg-secondary {
+  background-color: var(--color-secondary);
+}
+
+.bg-accent {
+  background-color: var(--color-accent);
+}
+
+.bg-black {
+  background-color: var(--color-black);
+}
+
+.bg-transparent {
+  background: transparent;
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.user-select-none {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.no-outline {
+  outline: none;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.blur-background {
+  backdrop-filter: var(--blur-lg);
+}
+
+/* ========================================
+   RESPONSIVE HELPERS
+   ======================================== */
+
+/* Hide on mobile */
+@media (max-width: 767px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* Hide on desktop */
+@media (min-width: 768px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}
+
+/* ========================================
+   NOTES FOR FUTURE UPDATES
+   ======================================== */
+
+/*
+  TO UPDATE FROM STYLING DOCUMENTATION:
+  
+  1. Update color palette in :root section
+  2. Add any new brand colors
+  3. Update font families if different
+  4. Adjust spacing scale if needed
+  5. Add component-specific variables
+  6. Update breakpoints if needed
+  
+  USAGE EXAMPLES:
+  
+  Color: 
+    background-color: var(--color-primary-blue);
+  
+  Font:
+    font-family: var(--font-primary);
+    font-size: var(--font-size-lg);
+  
+  Spacing:
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
+  
+  Shadow:
+    box-shadow: var(--shadow-lg);
+  
+  Transition:
+    transition: all var(--transition-base);
+*/
+

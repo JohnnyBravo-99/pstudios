@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import './BackgroundVideo.css';
+import '../styles/BackgroundVideo.css';
 
-function BackgroundVideo({ isVideoActive }) {
+function BackgroundVideo({ isVideoActive = true }) {
     const [active, setActive] = useState(false);
 
     useEffect(() => {
-        const timeout = setTimeout(() => { setActive(true); }, 50);
-        return () => clearTimeout(timeout);
-    }, []);
+        if (isVideoActive) {
+            const timeout = setTimeout(() => { 
+                setActive(true); 
+                console.log('BackgroundVideo activated');
+            }, 50);
+            return () => clearTimeout(timeout);
+        }
+    }, [isVideoActive]);
+
+    if (!isVideoActive) return null;
 
     return (
         <div className={`video-container ${active ? 'active' : ''}`}>
@@ -19,6 +26,8 @@ function BackgroundVideo({ isVideoActive }) {
                 playsInline
                 controls={false}
                 draggable={false}
+                onLoadedData={() => console.log('Video loaded successfully')}
+                onError={(e) => console.error('Video error:', e)}
             >
                 <source src="/bg-video.mp4" type="video/mp4" />
                 Your browser does not support HTML5 video

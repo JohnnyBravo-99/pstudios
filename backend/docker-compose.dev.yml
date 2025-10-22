@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  mongo-dev:
+    image: mongo:6.0
+    container_name: pstudios_mongo_dev
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=pstudios-dev
+    volumes:
+      - mongo-dev-data:/data/db
+    networks:
+      - dev-network
+
+  mongo-express-dev:
+    image: mongo-express
+    container_name: pstudios_mongo_express_dev
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo-dev
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    depends_on:
+      - mongo-dev
+    networks:
+      - dev-network
+
+volumes:
+  mongo-dev-data:
+
+networks:
+  dev-network:
+    driver: bridge
