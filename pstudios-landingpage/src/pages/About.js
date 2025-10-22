@@ -1,58 +1,81 @@
 import React from 'react';
-import './Page.css';
-
-// Import all branding pages in numerical order
-import CoverPage from '../assets/branding-pages/1coverPage.webp';
-import TableOfContents from '../assets/branding-pages/2tableOfContents.webp';
-import OurMission from '../assets/branding-pages/3our Mission.webp';
-import OurApproach from '../assets/branding-pages/4our Approach.webp';
-import Manifesto from '../assets/branding-pages/5Manifesto.webp';
-import Personality from '../assets/branding-pages/6personality.webp';
-import Rules001 from '../assets/branding-pages/7rules_001.webp';
-import Rules002 from '../assets/branding-pages/8rules_002.webp';
-import Rules003 from '../assets/branding-pages/9rules_003.webp';
-import StyleCoverPage from '../assets/branding-pages/10ourStyleCoverPage.webp';
-import Artboard9Copy3 from '../assets/branding-pages/11Artboard 9 copy 3.webp';
-import OurLogo from '../assets/branding-pages/12ourLogo.webp';
-import Artboard16 from '../assets/branding-pages/13Artboard 16.webp';
-import Artboard16Copy from '../assets/branding-pages/14Artboard 16 copy.webp';
-import Artboard9Copy4 from '../assets/branding-pages/15Artboard 9 copy 4.webp';
-import Artboard9Copy5 from '../assets/branding-pages/16Artboard 9 copy 5.webp';
-import Artboard9Copy6 from '../assets/branding-pages/17Artboard 9 copy 6.webp';
+import '../styles/Page.css';
 
 function About() {
-  // Array of branding pages in order
-  const brandingPages = [
-    { src: CoverPage, alt: 'Cover Page' },
-    { src: TableOfContents, alt: 'Table of Contents' },
-    { src: OurMission, alt: 'Our Mission' },
-    { src: OurApproach, alt: 'Our Approach' },
-    { src: Manifesto, alt: 'Manifesto' },
-    { src: Personality, alt: 'Personality' },
-    { src: Rules001, alt: 'Rules 001' },
-    { src: Rules002, alt: 'Rules 002' },
-    { src: Rules003, alt: 'Rules 003' },
-    { src: StyleCoverPage, alt: 'Style Cover Page' },
-    { src: Artboard9Copy3, alt: 'Artboard 9 Copy 3' },
-    { src: OurLogo, alt: 'Our Logo' },
-    { src: Artboard16, alt: 'Artboard 16' },
-    { src: Artboard16Copy, alt: 'Artboard 16 Copy' },
-    { src: Artboard9Copy4, alt: 'Artboard 9 Copy 4' },
-    { src: Artboard9Copy5, alt: 'Artboard 9 Copy 5' },
-    { src: Artboard9Copy6, alt: 'Artboard 9 Copy 6' }
-  ];
-
   return (
     <div className="page-container about-page">
-      <div className="branding-images-section">
-        {brandingPages.map((page, index) => (
-          <img
-            key={index}
-            src={page.src}
-            alt={page.alt}
-            className="branding-image"
-          />
-        ))}
+      <div className="about-content-section">
+        <div className="about-section">
+          <h2 className="section-title">Our Mission</h2>
+          <p className="section-content">
+            At Paradigm Studios, we craft next-generation visual experiences that push the boundaries of digital artistry.
+            From immersive game worlds to striking brand identities, our mission is to transform creative visions into
+            stunning realities that captivate and inspire.
+          </p>
+        </div>
+
+        <div className="about-section">
+          <h2 className="section-title">Our Approach</h2>
+          <p className="section-content">
+            Every project begins with deep collaboration and strategic thinking. We blend artistic intuition with
+            technical precision, ensuring that each design serves both aesthetic beauty and functional purpose.
+            Our process is transparent, iterative, and always client-focused.
+          </p>
+        </div>
+
+        <div className="about-section">
+          <h2 className="section-title">Our Manifesto</h2>
+          <p className="section-content">
+            Design is not just about making things look beautiful—it's about creating experiences that matter.
+            We believe in the power of visual storytelling, the importance of pixel-perfect execution, and the
+            endless potential of creative collaboration. Every project is an opportunity to innovate, inspire,
+            and leave a lasting impression.
+          </p>
+        </div>
+
+        <div className="about-section">
+          <h2 className="section-title">Our Process</h2>
+          <div className="process-steps">
+            <div className="process-step">
+              <h3 className="step-title">Discovery</h3>
+              <p className="step-content">Understanding your vision, goals, and target audience</p>
+            </div>
+            <div className="process-step">
+              <h3 className="step-title">Design</h3>
+              <p className="step-content">Creating concepts and iterating based on your feedback</p>
+            </div>
+            <div className="process-step">
+              <h3 className="step-title">Development</h3>
+              <p className="step-content">Bringing designs to life with precision and care</p>
+            </div>
+            <div className="process-step">
+              <h3 className="step-title">Delivery</h3>
+              <p className="step-content">Final implementation and ongoing support</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="about-section">
+          <h2 className="section-title">Why Choose Us</h2>
+          <div className="features-grid">
+            <div className="feature-item">
+              <h3 className="feature-title">Expert Craftsmanship</h3>
+              <p className="feature-content">Years of experience in game visuals, branding, and narrative design</p>
+            </div>
+            <div className="feature-item">
+              <h3 className="feature-title">Collaborative Process</h3>
+              <p className="feature-content">We work closely with you every step of the way</p>
+            </div>
+            <div className="feature-item">
+              <h3 className="feature-title">Technical Excellence</h3>
+              <p className="feature-content">Cutting-edge tools and techniques for optimal results</p>
+            </div>
+            <div className="feature-item">
+              <h3 className="feature-title">Timely Delivery</h3>
+              <p className="feature-content">Projects completed on schedule with consistent communication</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

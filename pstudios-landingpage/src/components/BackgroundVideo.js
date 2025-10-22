@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './BackgroundVideo.css';
+import '../styles/BackgroundVideo.css';
 
 function BackgroundVideo({ isVideoActive = true }) {
     const [active, setActive] = useState(false);

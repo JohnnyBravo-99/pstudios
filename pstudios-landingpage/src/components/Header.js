@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import logoImage from '../assets/logo-submark-marks-iconography/verticalStacked_01a.svg';
-import './Header.css';
+import '../styles/Header.css';
 
 function Header() {
   const location = useLocation();
@@ -28,6 +28,9 @@ function Header() {
           </li>
           <li className={`nav-item ${isActive('/portfolio')}`}>
             <Link to="/portfolio" className="nav-link">Our Portfolio</Link>
+          </li>
+          <li className={`nav-item ${isActive('/services')}`}>
+            <Link to="/services" className="nav-link">Services</Link>
           </li>
           <li className={`nav-item ${isActive('/contact')}`}>
             <Link to="/contact" className="nav-link">Contact Us</Link>

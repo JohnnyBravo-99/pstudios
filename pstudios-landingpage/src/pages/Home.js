@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import logo from '../assets/logo-submark-marks-iconography/lp_logo.svg';
-import './Page.css';
+import '../styles/Page.css';
 
 function Home() {
   const [showLanding, setShowLanding] = useState(true);
