@@ -105,13 +105,20 @@ portfolioItemSchema.pre('save', function(next) {
 
 // Generate slug from title
 portfolioItemSchema.pre('save', function(next) {
-  if (this.isModified('title') && !this.slug) {
-    this.slug = this.title
+  if (this.isModified('title') && (!this.slug || this.slug === '')) {
+    let baseSlug = this.title
       .toLowerCase()
       .replace(/[^a-z0-9 -]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .trim('-');
+    
+    // Ensure slug is not empty
+    if (!baseSlug) {
+      baseSlug = 'portfolio-item';
+    }
+    
+    this.slug = baseSlug;
   }
   next();
 });

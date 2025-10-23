@@ -87,16 +87,34 @@ router.post('/portfolio', async (req, res) => {
     }
 
     const item = new PortfolioItem(value);
-    await item.save();
+    
+    // Handle slug conflicts by adding timestamp
+    let attempts = 0;
+    const maxAttempts = 5;
+    
+    while (attempts < maxAttempts) {
+      try {
+        await item.save();
+        break;
+      } catch (saveError) {
+        if (saveError.code === 11000 && saveError.keyPattern.slug) {
+          // Slug conflict, add timestamp
+          item.slug = `${item.slug}-${Date.now()}`;
+          attempts++;
+        } else {
+          throw saveError;
+        }
+      }
+    }
+    
+    if (attempts >= maxAttempts) {
+      return res.status(400).json({ error: 'Could not generate unique slug' });
+    }
 
     res.status(201).json(item);
   } catch (error) {
     console.error('Error creating portfolio item:', error);
-    if (error.code === 11000) {
-      res.status(400).json({ error: 'Slug already exists' });
-    } else {
-      res.status(500).json({ error: 'Internal server error' });
-    }
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
