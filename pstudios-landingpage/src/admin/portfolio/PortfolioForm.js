@@ -384,6 +384,11 @@ function PortfolioForm() {
           Back to Portfolio
         </button>
       </div>
+      
+      {/* DEBUG: Test if component is rendering */}
+      <div style={{ background: 'yellow', padding: '10px', margin: '10px 0' }}>
+        <strong>DEBUG:</strong> PortfolioForm is rendering. isEdit: {isEdit ? 'true' : 'false'}, id: {id}
+      </div>
 
       {error && <div className="error-message">{error}</div>}
       {success && <div className="success-message" style={{ color: 'green', marginBottom: '1rem', padding: '0.5rem', backgroundColor: '#d4edda', border: '1px solid #c3e6cb', borderRadius: '4px' }}>{success}</div>}
@@ -526,10 +531,14 @@ function PortfolioForm() {
         </div>
       </form>
 
-      {isEdit && (
-        <div className="form-section">
-          <h2>Media</h2>
-          <MediaUploader itemId={id} onUploadSuccess={handleMediaUploadSuccess} onUploadComplete={refetchMedia} />
+      <div className="form-section">
+        <h2>Media</h2>
+        <div className="media-uploader" style={{ padding: '20px', border: '2px dashed #ccc', borderRadius: '8px', textAlign: 'center' }}>
+          <h3>Media Uploader Test</h3>
+          <p>Item ID: {id}</p>
+          <p>This should be visible in edit mode</p>
+          <input type="file" accept="image/*,video/*,.glb" style={{ marginTop: '10px' }} />
+        </div>
           
           {/* Display uploaded media */}
           {uploadedMedia.length > 0 && (
@@ -562,7 +571,6 @@ function PortfolioForm() {
             </div>
           )}
         </div>
-      )}
     </div>
   );
 }
