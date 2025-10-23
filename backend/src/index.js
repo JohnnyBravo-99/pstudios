@@ -31,8 +31,10 @@ app.use('/api/', limiter);
 app.use(cors({
   origin: [
     process.env.CLIENT_ORIGIN || 'http://localhost:3000',
-    'https://johnnybravo-99.github.io',
-    'https://johnnybravo-99.github.io/pstudios'
+    'https://www.paradigmstudios.art',           // ← Your actual domain
+    'https://paradigmstudios.art',               // ← Without www
+    'https://johnnybravo-99.github.io',         // ← Keep for backup
+    'https://johnnybravo-99.github.io/pstudios' // ← Keep for backup
   ],
   credentials: true
 }));
