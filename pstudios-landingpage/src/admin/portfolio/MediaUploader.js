@@ -6,11 +6,40 @@ function MediaUploader({ itemId, onUploadSuccess, onUploadComplete }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [dragActive, setDragActive] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const validateFile = (file) => {
+    const maxSize = 50 * 1024 * 1024; // 50MB
+    const allowedTypes = [
+      'image/jpeg', 'image/jpg', 'image/png', 'image/webp',
+      'video/mp4',
+      'model/gltf-binary', 'application/octet-stream' // GLB files
+    ];
+    
+    if (file.size > maxSize) {
+      return 'File size must be less than 50MB';
+    }
+    
+    if (!allowedTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.glb')) {
+      return 'File type not supported. Please use JPEG, PNG, WebP, MP4, or GLB files.';
+    }
+    
+    return null;
+  };
 
   const handleFileUpload = async (file) => {
     console.log('Starting file upload:', file.name, 'to item:', itemId);
+    
+    // Validate file
+    const validationError = validateFile(file);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+    
     setUploading(true);
     setError('');
+    setUploadProgress(0);
 
     const formData = new FormData();
     formData.append('media', file);
@@ -29,6 +58,7 @@ function MediaUploader({ itemId, onUploadSuccess, onUploadComplete }) {
       console.log('Response data:', data);
 
       if (response.ok) {
+        setUploadProgress(100);
         // Call the success callback instead of reloading
         if (onUploadSuccess) {
           onUploadSuccess(data.media);
@@ -39,6 +69,10 @@ function MediaUploader({ itemId, onUploadSuccess, onUploadComplete }) {
         }
         setError(''); // Clear any previous errors
         console.log('Upload successful');
+        // Reset progress after a short delay
+        setTimeout(() => {
+          setUploadProgress(0);
+        }, 1000);
       } else {
         setError(data.error || 'Upload failed');
         console.error('Upload failed:', data.error);
@@ -103,6 +137,17 @@ function MediaUploader({ itemId, onUploadSuccess, onUploadComplete }) {
           <label htmlFor="media-upload" className="upload-button">
             {uploading ? 'Uploading...' : 'Choose File'}
           </label>
+          {uploading && (
+            <div className="upload-progress">
+              <div className="progress-bar">
+                <div 
+                  className="progress-fill" 
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
+              <span>{uploadProgress}%</span>
+            </div>
+          )}
         </div>
       </div>
 

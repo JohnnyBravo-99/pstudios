@@ -213,8 +213,17 @@ function PortfolioForm() {
           setSuccess('Portfolio item updated successfully!');
           console.log('Portfolio item updated successfully');
         } else {
-          // For new items, navigate to the list
-          navigate('/admin/portfolio');
+          // For new items, redirect to edit mode to allow media upload
+          const newItemId = data._id || data.id;
+          if (newItemId) {
+            setSuccess('Project created successfully! You can now upload media files.');
+            // Small delay to show success message before redirect
+            setTimeout(() => {
+              navigate(`/admin/portfolio/${newItemId}`);
+            }, 1500);
+          } else {
+            navigate('/admin/portfolio');
+          }
         }
       } else {
         setError(data.error || 'Failed to save portfolio item');
