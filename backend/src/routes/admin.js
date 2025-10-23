@@ -65,6 +65,21 @@ const portfolioItemSchema = Joi.object({
   isPublished: Joi.boolean().default(false)
 });
 
+// Partial update schema for PATCH requests
+const portfolioItemUpdateSchema = Joi.object({
+  title: Joi.string(),
+  type: Joi.string().valid('3d-asset', 'branding', 'ui-ux', 'cinematic', 'game', 'web'),
+  tags: Joi.array().items(Joi.string()),
+  meta: Joi.object(),
+  links: Joi.object({
+    live: Joi.string().uri(),
+    download: Joi.string().uri(),
+    repo: Joi.string().uri()
+  }),
+  order: Joi.number(),
+  isPublished: Joi.boolean()
+});
+
 // Get all portfolio items (admin view)
 router.get('/portfolio', async (req, res) => {
   try {
@@ -121,7 +136,7 @@ router.post('/portfolio', async (req, res) => {
 // Update portfolio item
 router.patch('/portfolio/:id', async (req, res) => {
   try {
-    const { error, value } = portfolioItemSchema.validate(req.body);
+    const { error, value } = portfolioItemUpdateSchema.validate(req.body);
     if (error) {
       return res.status(400).json({ error: error.details[0].message });
     }

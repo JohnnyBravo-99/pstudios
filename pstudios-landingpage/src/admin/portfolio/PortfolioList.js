@@ -54,6 +54,9 @@ function PortfolioList() {
 
   const togglePublished = async (id, currentStatus) => {
     try {
+      console.log('Toggling published status for item:', id, 'Current status:', currentStatus);
+      console.log('API URL:', `${API_BASE_URL}/api/admin/portfolio/${id}`);
+      
       const response = await fetch(`${API_BASE_URL}/api/admin/portfolio/${id}`, {
         method: 'PATCH',
         headers: {
@@ -63,17 +66,25 @@ function PortfolioList() {
         body: JSON.stringify({ isPublished: !currentStatus }),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
       if (response.ok) {
+        const data = await response.json();
+        console.log('Updated item data:', data);
         setItems(items.map(item => 
           item._id === id 
             ? { ...item, isPublished: !currentStatus }
             : item
         ));
       } else {
-        setError('Failed to update item');
+        const errorData = await response.json();
+        console.error('Error response:', errorData);
+        setError(`Failed to update item: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
-      setError('Network error');
+      console.error('Network error:', error);
+      setError(`Network error: ${error.message}`);
     }
   };
 
