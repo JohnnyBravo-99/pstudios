@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.css": "https://www.paradigmstudios.art/static/css/main.1c37b12a.css",
-    "main.js": "https://www.paradigmstudios.art/static/js/main.fe963842.js",
+    "main.css": "https://www.paradigmstudios.art/static/css/main.f8e3dbc1.css",
+    "main.js": "https://www.paradigmstudios.art/static/js/main.bd72493b.js",
     "static/js/453.fa8f2877.chunk.js": "https://www.paradigmstudios.art/static/js/453.fa8f2877.chunk.js",
     "static/media/PlayfairDisplay-VariableFont_wght.ttf": "https://www.paradigmstudios.art/static/media/PlayfairDisplay-VariableFont_wght.bf46a6bcddc9999a295e.ttf",
     "static/media/Beckan Regular.woff2": "https://www.paradigmstudios.art/static/media/Beckan Regular.0db6437e16e85e488ff1.woff2",
     "static/media/lp_logo.svg": "https://www.paradigmstudios.art/static/media/lp_logo.c407cf85708d93be8ce2013c75fbd3d4.svg",
     "static/media/verticalStacked_01a.svg": "https://www.paradigmstudios.art/static/media/verticalStacked_01a.d9f9ffaf6967faff771286d926ba2e9f.svg",
     "index.html": "https://www.paradigmstudios.art/index.html",
-    "main.1c37b12a.css.map": "https://www.paradigmstudios.art/static/css/main.1c37b12a.css.map",
-    "main.fe963842.js.map": "https://www.paradigmstudios.art/static/js/main.fe963842.js.map",
+    "main.f8e3dbc1.css.map": "https://www.paradigmstudios.art/static/css/main.f8e3dbc1.css.map",
+    "main.bd72493b.js.map": "https://www.paradigmstudios.art/static/js/main.bd72493b.js.map",
     "453.fa8f2877.chunk.js.map": "https://www.paradigmstudios.art/static/js/453.fa8f2877.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.1c37b12a.css",
-    "static/js/main.fe963842.js"
+    "static/css/main.f8e3dbc1.css",
+    "static/js/main.bd72493b.js"
   ]
 }
