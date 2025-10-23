@@ -145,9 +145,6 @@ function PortfolioList() {
       {items.length === 0 && (
         <div className="empty-state">
           <p>No portfolio items found.</p>
-          <Link to="/admin/portfolio/new" className="add-button">
-            Add Your First Project
-          </Link>
         </div>
       )}
     </div>

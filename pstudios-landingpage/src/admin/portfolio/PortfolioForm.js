@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import MediaUploader from './MediaUploader';
+// import MediaUploader from './MediaUploader';
 import '../../styles/Admin.css';
 import API_BASE_URL from '../../config/api';
 
@@ -526,10 +526,13 @@ function PortfolioForm() {
         </div>
       </form>
 
-      {isEdit && (
-        <div className="form-section">
-          <h2>Media</h2>
-          <MediaUploader itemId={id} onUploadSuccess={handleMediaUploadSuccess} onUploadComplete={refetchMedia} />
+      <div className="form-section">
+        <h2>Media</h2>
+        <div className="media-uploader">
+          <h3>Media Uploader (Inline)</h3>
+          <p>Item ID: {id}</p>
+          <p>This is an inline test version of the MediaUploader component.</p>
+        </div>
           
           {/* Display uploaded media */}
           {uploadedMedia.length > 0 && (
@@ -562,7 +565,6 @@ function PortfolioForm() {
             </div>
           )}
         </div>
-      )}
     </div>
   );
 }
