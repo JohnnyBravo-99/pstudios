@@ -183,7 +183,9 @@ function Portfolio() {
 
   const fetchPortfolioItems = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/portfolio`);
+      const response = await fetch(`${API_BASE_URL}/api/portfolio`, {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setItems(data);
