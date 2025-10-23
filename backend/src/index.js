@@ -27,15 +27,26 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// CORS configuration
+// CORS configuration - Dynamic origin handling
+const allowedOrigins = [
+  process.env.CLIENT_ORIGIN || 'http://localhost:3000',
+  'https://www.paradigmstudios.art',
+  'https://paradigmstudios.art',
+  'https://johnnybravo-99.github.io',
+  'https://johnnybravo-99.github.io/pstudios'
+];
+
 app.use(cors({
-  origin: [
-    process.env.CLIENT_ORIGIN || 'http://localhost:3000',
-    'https://www.paradigmstudios.art',           // ← Your actual domain
-    'https://paradigmstudios.art',               // ← Without www
-    'https://johnnybravo-99.github.io',         // ← Keep for backup
-    'https://johnnybravo-99.github.io/pstudios' // ← Keep for backup
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
