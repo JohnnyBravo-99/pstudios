@@ -14,18 +14,28 @@ function PortfolioList() {
 
   const fetchItems = async () => {
     try {
+      console.log('Fetching portfolio items...');
       const response = await fetch(`${API_BASE_URL}/api/admin/portfolio`, {
         credentials: 'include',
       });
 
+      console.log('Fetch response status:', response.status);
+      console.log('Fetch response ok:', response.ok);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('Fetched items:', data);
         setItems(data);
       } else {
-        setError('Failed to fetch portfolio items');
+        if (response.status === 401) {
+          setError('Authentication required. Please login again.');
+        } else {
+          setError(`Failed to load items: ${response.status}`);
+        }
       }
     } catch (error) {
-      setError('Network error');
+      console.error('Fetch error:', error);
+      setError(`Network error: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -54,9 +64,25 @@ function PortfolioList() {
 
   const togglePublished = async (id, currentStatus) => {
     try {
-      console.log('Toggling published status for item:', id, 'Current status:', currentStatus);
-      console.log('API URL:', `${API_BASE_URL}/api/admin/portfolio/${id}`);
+      console.log('=== PATCH REQUEST DEBUG ===');
+      console.log('Item ID:', id);
+      console.log('Current status:', currentStatus);
+      console.log('New status:', !currentStatus);
+      console.log('API Base URL:', API_BASE_URL);
+      console.log('Full URL:', `${API_BASE_URL}/api/admin/portfolio/${id}`);
       
+      // Test if we can reach the API at all
+      console.log('Testing API connectivity...');
+      const testResponse = await fetch(`${API_BASE_URL}/api/health`, {
+        credentials: 'include'
+      });
+      console.log('Health check response:', testResponse.status, testResponse.ok);
+      
+      if (!testResponse.ok) {
+        throw new Error(`API health check failed: ${testResponse.status}`);
+      }
+      
+      console.log('Sending PATCH request...');
       const response = await fetch(`${API_BASE_URL}/api/admin/portfolio/${id}`, {
         method: 'PATCH',
         headers: {
@@ -66,8 +92,9 @@ function PortfolioList() {
         body: JSON.stringify({ isPublished: !currentStatus }),
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
+      console.log('PATCH Response status:', response.status);
+      console.log('PATCH Response ok:', response.ok);
+      console.log('PATCH Response headers:', [...response.headers.entries()]);
 
       if (response.ok) {
         const data = await response.json();
@@ -77,13 +104,17 @@ function PortfolioList() {
             ? { ...item, isPublished: !currentStatus }
             : item
         ));
+        console.log('✅ Successfully updated item');
       } else {
         const errorData = await response.json();
-        console.error('Error response:', errorData);
+        console.error('❌ Error response:', errorData);
         setError(`Failed to update item: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error('Network error:', error);
+      console.error('❌ Network error:', error);
+      console.error('Error type:', error.constructor.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
       setError(`Network error: ${error.message}`);
     }
   };
