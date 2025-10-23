@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Debug Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>API Debug Tool for Paradigm Studios</h1>
+    
+    <div class="test-section">
+        <h2>1. Basic Connectivity Test</h2>
+        <button onclick="testHealth()">Test API Health</button>
+        <div id="health-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. CORS Test</h2>
+        <button onclick="testCORS()">Test CORS Configuration</button>
+        <div id="cors-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Authentication Test</h2>
+        <button onclick="testAuth()">Test Authentication</button>
+        <div id="auth-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. PATCH Method Test</h2>
+        <button onclick="testPATCH()">Test PATCH Request</button>
+        <div id="patch-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Complete Debug</h2>
+        <button onclick="runAllTests()">Run All Tests</button>
+        <div id="all-results"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://api.paradigmstudios.art';
+        
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            element.innerHTML += `<div class="${className}">${new Date().toLocaleTimeString()}: ${message}</div>`;
+        }
+        
+        async function testHealth() {
+            log('health-result', 'Testing API health endpoint...', 'info');
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/health`);
+                const data = await response.json();
+                log('health-result', `✅ Health check successful: ${response.status}`, 'success');
+                log('health-result', `Response: ${JSON.stringify(data, null, 2)}`, 'info');
+            } catch (error) {
+                log('health-result', `❌ Health check failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testCORS() {
+            log('cors-result', 'Testing CORS configuration...', 'info');
+            try {
+                // Test OPTIONS preflight request
+                const response = await fetch(`${API_BASE_URL}/api/admin/portfolio`, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Access-Control-Request-Method': 'PATCH',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+                
+                log('cors-result', `OPTIONS response status: ${response.status}`, 'info');
+                log('cors-result', `Access-Control-Allow-Methods: ${response.headers.get('Access-Control-Allow-Methods')}`, 'info');
+                log('cors-result', `Access-Control-Allow-Origin: ${response.headers.get('Access-Control-Allow-Origin')}`, 'info');
+                log('cors-result', `Access-Control-Allow-Credentials: ${response.headers.get('Access-Control-Allow-Credentials')}`, 'info');
+                
+                if (response.status === 200) {
+                    log('cors-result', '✅ CORS preflight successful', 'success');
+                } else {
+                    log('cors-result', '❌ CORS preflight failed', 'error');
+                }
+            } catch (error) {
+                log('cors-result', `❌ CORS test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testAuth() {
+            log('auth-result', 'Testing authentication...', 'info');
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+                    credentials: 'include'
+                });
+                
+                log('auth-result', `Auth response status: ${response.status}`, 'info');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('auth-result', '✅ Authentication successful', 'success');
+                    log('auth-result', `User: ${JSON.stringify(data, null, 2)}`, 'info');
+                } else {
+                    log('auth-result', '❌ Authentication failed - please login first', 'error');
+                }
+            } catch (error) {
+                log('auth-result', `❌ Auth test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testPATCH() {
+            log('patch-result', 'Testing PATCH method...', 'info');
+            try {
+                // First get a portfolio item ID
+                const listResponse = await fetch(`${API_BASE_URL}/api/admin/portfolio`, {
+                    credentials: 'include'
+                });
+                
+                if (!listResponse.ok) {
+                    log('patch-result', '❌ Cannot fetch portfolio list - authentication required', 'error');
+                    return;
+                }
+                
+                const items = await listResponse.json();
+                if (items.length === 0) {
+                    log('patch-result', '❌ No portfolio items found to test with', 'error');
+                    return;
+                }
+                
+                const testItem = items[0];
+                log('patch-result', `Testing with item: ${testItem.title} (ID: ${testItem._id})`, 'info');
+                
+                const response = await fetch(`${API_BASE_URL}/api/admin/portfolio/${testItem._id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ isPublished: !testItem.isPublished })
+                });
+                
+                log('patch-result', `PATCH response status: ${response.status}`, 'info');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('patch-result', '✅ PATCH request successful', 'success');
+                    log('patch-result', `Updated item: ${JSON.stringify(data, null, 2)}`, 'info');
+                } else {
+                    const errorData = await response.json();
+                    log('patch-result', `❌ PATCH request failed: ${errorData.error || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                log('patch-result', `❌ PATCH test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function runAllTests() {
+            log('all-results', '🚀 Starting comprehensive API debug...', 'info');
+            await testHealth();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testCORS();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testAuth();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testPATCH();
+            log('all-results', '✅ All tests completed!', 'success');
+        }
+    </script>
+</body>
+</html>
