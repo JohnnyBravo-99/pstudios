@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Debug</title>
+</head>
+<body>
+    <h1>API Debug Tool</h1>
+    <button onclick="testAPI()">Test API</button>
+    <div id="results"></div>
+    
+    <script>
+        async function testAPI() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing API...</p>';
+            
+            try {
+                // Test 1: Health Check
+                console.log('Testing health...');
+                const health = await fetch('https://api.paradigmstudios.art/api/health');
+                const healthData = await health.json();
+                results.innerHTML += `<p>✅ Health: ${health.status} - ${JSON.stringify(healthData)}</p>`;
+                
+                // Test 2: CORS
+                console.log('Testing CORS...');
+                const cors = await fetch('https://api.paradigmstudios.art/api/admin/portfolio', {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Access-Control-Request-Method': 'PATCH',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+                results.innerHTML += `<p>CORS Status: ${cors.status}</p>`;
+                results.innerHTML += `<p>Allow Methods: ${cors.headers.get('Access-Control-Allow-Methods')}</p>`;
+                results.innerHTML += `<p>Allow Origin: ${cors.headers.get('Access-Control-Allow-Origin')}</p>`;
+                
+                // Test 3: Auth
+                console.log('Testing auth...');
+                const auth = await fetch('https://api.paradigmstudios.art/api/auth/me', {
+                    credentials: 'include'
+                });
+                results.innerHTML += `<p>Auth Status: ${auth.status}</p>`;
+                
+            } catch (error) {
+                results.innerHTML += `<p>❌ Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
