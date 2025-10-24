@@ -7,10 +7,33 @@ function PortfolioList() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    checkAuth();
     fetchItems();
   }, []);
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ User authenticated:', data.user?.email);
+        setIsAuthenticated(true);
+      } else {
+        console.log('❌ Authentication failed');
+        setIsAuthenticated(false);
+        setError('Authentication required. Please login again.');
+      }
+    } catch (error) {
+      console.error('Auth check error:', error);
+      setIsAuthenticated(false);
+    }
+  };
 
   const fetchItems = async () => {
     try {
@@ -71,6 +94,22 @@ function PortfolioList() {
       console.log('API Base URL:', API_BASE_URL);
       console.log('Full URL:', `${API_BASE_URL}/api/admin/portfolio/${id}`);
       
+      // Check authentication first
+      console.log('🔐 Checking authentication...');
+      const authResponse = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        credentials: 'include'
+      });
+      console.log('Auth check status:', authResponse.status);
+      
+      if (!authResponse.ok) {
+        console.error('❌ Authentication failed - user not logged in');
+        setError('Authentication required. Please login again.');
+        return;
+      }
+      
+      const authData = await authResponse.json();
+      console.log('✅ User authenticated:', authData.user?.email || 'Unknown');
+      
       // Test if we can reach the API at all
       console.log('Testing API connectivity...');
       const testResponse = await fetch(`${API_BASE_URL}/api/health`, {
@@ -108,7 +147,11 @@ function PortfolioList() {
       } else {
         const errorData = await response.json();
         console.error('❌ Error response:', errorData);
-        setError(`Failed to update item: ${errorData.error || 'Unknown error'}`);
+        if (response.status === 401) {
+          setError('Authentication expired. Please login again.');
+        } else {
+          setError(`Failed to update item: ${errorData.error || 'Unknown error'}`);
+        }
       }
     } catch (error) {
       console.error('❌ Network error:', error);
@@ -121,6 +164,16 @@ function PortfolioList() {
 
   if (loading) {
     return <div className="loading">Loading portfolio items...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="error-message">
+        <h2>Authentication Required</h2>
+        <p>Please login to access the portfolio management.</p>
+        <Link to="/login" className="btn btn-primary">Go to Login</Link>
+      </div>
+    );
   }
 
   return (
