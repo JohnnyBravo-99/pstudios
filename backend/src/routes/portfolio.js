@@ -7,8 +7,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const items = await PortfolioItem.find({ isPublished: true })
-      .sort({ order: 1, createdAt: -1 })
-      .select('-meta -links'); // Exclude sensitive fields for public
+      .sort({ order: 1, createdAt: -1 });
 
     res.json(items);
   } catch (error) {

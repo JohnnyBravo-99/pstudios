@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-// import MediaUploader from './MediaUploader';
+import MediaUploader from './MediaUploader';
+import { resolveMediaUrl } from '../../utils/media';
 import '../../styles/Admin.css';
 import API_BASE_URL from '../../config/api';
 
@@ -528,11 +529,20 @@ function PortfolioForm() {
 
       <div className="form-section">
         <h2>Media</h2>
-        <div className="media-uploader">
-          <h3>Media Uploader (Inline)</h3>
-          <p>Item ID: {id}</p>
-          <p>This is an inline test version of the MediaUploader component.</p>
-        </div>
+        <MediaUploader
+          itemId={id}
+          onUploadSuccess={(media) => {
+            console.log('Media uploaded successfully:', media);
+            // Add the new media to the local state
+            setUploadedMedia(prev => [...prev, media]);
+            // Also refetch to ensure state is synchronized
+            refetchMedia();
+          }}
+          onUploadComplete={() => {
+            console.log('Media upload completed');
+            // Optional: Show success message or update UI
+          }}
+        />
           
           {/* Display uploaded media */}
           {uploadedMedia.length > 0 && (
@@ -541,7 +551,7 @@ function PortfolioForm() {
               <div className="media-grid">
                 {uploadedMedia.map((media, index) => (
                   <div key={media._id || index} className="media-item">
-                    <img src={media.src} alt={media.alt} style={{ width: '100px', height: '100px', objectFit: 'cover' }} />
+                    <img src={resolveMediaUrl(media.src)} alt={media.alt} style={{ width: '100px', height: '100px', objectFit: 'cover' }} />
                     <p>{media.alt}</p>
                     <button 
                       type="button" 

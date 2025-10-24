@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/Page.css';
 import API_BASE_URL from '../config/api';
+import { resolveMediaUrl } from '../utils/media';
 
 function PortfolioDetail({ item }) {
-  const images = item?.media?.images || [];
+  const [data, setData] = useState(item || {});
+  const images = data?.media?.images || [];
   const [activeIndex, setActiveIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -32,16 +34,36 @@ function PortfolioDetail({ item }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isFullscreen, images.length]);
 
+  // Fetch full item by slug if list payload was minimal
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchFull() {
+      if (!item?.slug) return;
+      const missingDetails = !item?.meta || Object.keys(item.meta || {}).length === 0 || !item?.media || !Array.isArray(item.media.images);
+      if (!missingDetails) return;
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/portfolio/${item.slug}`);
+        if (res.ok) {
+          const full = await res.json();
+          if (isMounted) setData(full);
+        }
+      } catch (_) {}
+    }
+    setData(item || {});
+    fetchFull();
+    return () => { isMounted = false; };
+  }, [item]);
+
   return (
     <>
       <div className="portfolio-detail">
       <aside className="portfolio-info">
-        <h2 className="portfolio-info-title">{item.title}</h2>
-        {item.type && <div className="portfolio-type">{item.type}</div>}
+        <h2 className="portfolio-info-title">{data.title}</h2>
+        {data.type && <div className="portfolio-type">{data.type}</div>}
 
-        {Array.isArray(item.tags) && item.tags.length > 0 && (
+        {Array.isArray(data.tags) && data.tags.length > 0 && (
           <div className="portfolio-tags">
-            {item.tags.map((t) => (
+            {data.tags.map((t) => (
               <span key={t} className="tag">{t}</span>
             ))}
           </div>
@@ -49,27 +71,27 @@ function PortfolioDetail({ item }) {
 
         <div className="portfolio-metrics">
           <dl>
-            {item.meta?.role && (<><dt>Role</dt><dd>{item.meta.role}</dd></>)}
-            {item.meta?.year && (<><dt>Year</dt><dd>{item.meta.year}</dd></>)}
-            {item.meta?.engine && (<><dt>Engine</dt><dd>{item.meta.engine}</dd></>)}
-            {item.meta?.software && (
+            {data.meta?.role && (<><dt>Role</dt><dd>{data.meta.role}</dd></>)}
+            {data.meta?.year && (<><dt>Year</dt><dd>{data.meta.year}</dd></>)}
+            {data.meta?.engine && (<><dt>Engine</dt><dd>{data.meta.engine}</dd></>)}
+            {data.meta?.software && (
               <>
                 <dt>Software</dt>
-                <dd>{Array.isArray(item.meta.software) ? item.meta.software.join(', ') : item.meta.software}</dd>
+                <dd>{Array.isArray(data.meta.software) ? data.meta.software.join(', ') : data.meta.software}</dd>
               </>
             )}
-            {item.type === '3d-asset' && item.meta?.polycount && (<><dt>Polycount</dt><dd>{item.meta.polycount}</dd></>)}
-            {item.type === '3d-asset' && item.meta?.maps && (<><dt>Maps</dt><dd>{Array.isArray(item.meta.maps) ? item.meta.maps.join(', ') : item.meta.maps}</dd></>)}
-            {item.type === '3d-asset' && item.meta?.texelDensity && (<><dt>Texel Density</dt><dd>{item.meta.texelDensity}</dd></>)}
-            {item.meta?.fileTypes && (<><dt>Files</dt><dd>{Array.isArray(item.meta.fileTypes) ? item.meta.fileTypes.join(', ') : item.meta.fileTypes}</dd></>)}
+            {data.type === '3d-asset' && data.meta?.polycount && (<><dt>Polycount</dt><dd>{data.meta.polycount}</dd></>)}
+            {data.type === '3d-asset' && data.meta?.maps && (<><dt>Maps</dt><dd>{Array.isArray(data.meta.maps) ? data.meta.maps.join(', ') : data.meta.maps}</dd></>)}
+            {data.type === '3d-asset' && data.meta?.texelDensity && (<><dt>Texel Density</dt><dd>{data.meta.texelDensity}</dd></>)}
+            {data.meta?.fileTypes && (<><dt>Files</dt><dd>{Array.isArray(data.meta.fileTypes) ? data.meta.fileTypes.join(', ') : data.meta.fileTypes}</dd></>)}
           </dl>
         </div>
 
-        {(item.links?.live || item.links?.download || item.links?.repo) && (
+        {(data.links?.live || data.links?.download || data.links?.repo) && (
           <div className="portfolio-actions">
-            {item.links?.live && <a className="btn" href={item.links.live} target="_blank" rel="noreferrer">View</a>}
-            {item.links?.download && <a className="btn btn-secondary" href={item.links.download}>Download</a>}
-            {item.links?.repo && <a className="btn" href={item.links.repo} target="_blank" rel="noreferrer">Repo</a>}
+            {data.links?.live && <a className="btn" href={data.links.live} target="_blank" rel="noreferrer">View</a>}
+            {data.links?.download && <a className="btn btn-secondary" href={data.links.download}>Download</a>}
+            {data.links?.repo && <a className="btn" href={data.links.repo} target="_blank" rel="noreferrer">Repo</a>}
           </div>
         )}
       </aside>
@@ -82,7 +104,7 @@ function PortfolioDetail({ item }) {
           title={hasImage ? "Click to view fullscreen" : ""}
         >
           {hasImage ? (
-            <img src={images[activeIndex].src} alt={images[activeIndex].alt || item.title} />
+            <img src={resolveMediaUrl(images[activeIndex].src)} alt={images[activeIndex].alt || data.title} />
           ) : (
             <div className="media-placeholder">No media available</div>
           )}
@@ -96,7 +118,7 @@ function PortfolioDetail({ item }) {
                 onClick={() => setActiveIndex(i)}
                 aria-selected={i === activeIndex}
               >
-                <img src={m.src} alt={m.alt || `${item.title} ${i + 1}`} />
+                <img src={resolveMediaUrl(m.src)} alt={m.alt || `${data.title} ${i + 1}`} />
               </button>
             ))}
           </div>
@@ -121,8 +143,8 @@ function PortfolioDetail({ item }) {
         <div className="fullscreen-media" onClick={(e) => e.stopPropagation()}>
           {hasImage && (
             <img 
-              src={images[activeIndex].src} 
-              alt={images[activeIndex].alt || item.title}
+              src={resolveMediaUrl(images[activeIndex].src)} 
+              alt={images[activeIndex].alt || data.title}
               className="fullscreen-image"
             />
           )}
@@ -152,7 +174,7 @@ function PortfolioDetail({ item }) {
                     onClick={() => setActiveIndex(i)}
                     aria-selected={i === activeIndex}
                   >
-                    <img src={m.src} alt={m.alt || `${item.title} ${i + 1}`} />
+                    <img src={resolveMediaUrl(m.src)} alt={m.alt || `${data.title} ${i + 1}`} />
                   </button>
                 ))}
               </div>
@@ -276,7 +298,7 @@ function Portfolio() {
             >
               {firstImage && (
                 <img 
-                  src={firstImage.src} 
+                  src={resolveMediaUrl(firstImage.src)} 
                   alt={firstImage.alt || item.title}
                   className="portfolio-card-image"
                 />
