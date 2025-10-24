@@ -93,6 +93,22 @@ router.get('/portfolio', async (req, res) => {
   }
 });
 
+// Get single portfolio item (admin view)
+router.get('/portfolio/:id', async (req, res) => {
+  try {
+    const item = await PortfolioItem.findById(req.params.id);
+    
+    if (!item) {
+      return res.status(404).json({ error: 'Portfolio item not found' });
+    }
+    
+    res.json(item);
+  } catch (error) {
+    console.error('Error fetching portfolio item:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Create new portfolio item
 router.post('/portfolio', async (req, res) => {
   try {
