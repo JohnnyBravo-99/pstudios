@@ -90,6 +90,31 @@ function PortfolioForm() {
         throw new Error(`Authentication failed: ${authResponse.status}`);
       }
       
+      // Check what portfolio items exist
+      console.log('Checking existing portfolio items...');
+      const listResponse = await fetch(`${API_BASE_URL}/api/admin/portfolio`, {
+        credentials: 'include'
+      });
+      console.log('Portfolio list status:', listResponse.status);
+      
+      if (listResponse.ok) {
+        const items = await listResponse.json();
+        console.log('Available portfolio items:', items.length);
+        console.log('Item IDs:', items.map(item => item._id));
+        console.log('Looking for ID:', id);
+        
+        const itemExists = items.find(item => item._id === id);
+        if (!itemExists) {
+          console.error('❌ Portfolio item not found in the list!');
+          console.error('Available items:', items);
+          throw new Error(`Portfolio item ${id} not found in database`);
+        } else {
+          console.log('✅ Portfolio item found in list:', itemExists);
+        }
+      } else {
+        console.error('❌ Failed to fetch portfolio list:', listResponse.status);
+      }
+      
       console.log('Sending fetch request...');
       const response = await fetch(`${API_BASE_URL}/api/admin/portfolio/${id}`, {
         credentials: 'include',
