@@ -65,35 +65,64 @@ function PortfolioForm() {
 
   const fetchItem = async () => {
     try {
-      console.log('Fetching portfolio item:', id);
-      console.log('API URL:', `${API_BASE_URL}/api/admin/portfolio/${id}`);
+      console.log('=== FETCH ITEM DEBUG ===');
+      console.log('Item ID:', id);
+      console.log('API Base URL:', API_BASE_URL);
+      console.log('Full URL:', `${API_BASE_URL}/api/admin/portfolio/${id}`);
       
+      // First check if we can reach the API at all
+      console.log('Testing API connectivity...');
+      const healthResponse = await fetch(`${API_BASE_URL}/api/health`);
+      console.log('Health check status:', healthResponse.status);
+      
+      if (!healthResponse.ok) {
+        throw new Error(`API health check failed: ${healthResponse.status}`);
+      }
+      
+      // Check authentication
+      console.log('Checking authentication...');
+      const authResponse = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        credentials: 'include'
+      });
+      console.log('Auth check status:', authResponse.status);
+      
+      if (!authResponse.ok) {
+        throw new Error(`Authentication failed: ${authResponse.status}`);
+      }
+      
+      console.log('Sending fetch request...');
       const response = await fetch(`${API_BASE_URL}/api/admin/portfolio/${id}`, {
         credentials: 'include',
       });
 
       console.log('Fetch response status:', response.status);
       console.log('Fetch response ok:', response.ok);
+      console.log('Response headers:', [...response.headers.entries()]);
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Fetched item data:', data);
+        console.log('✅ Fetched item data:', data);
         setFormData(data);
         // Initialize uploaded media from the fetched item
         if (data.media && data.media.images) {
           setUploadedMedia(data.media.images);
         }
       } else {
+        const errorText = await response.text();
+        console.error('❌ Fetch failed:', response.status, errorText);
+        
         if (response.status === 404) {
           setError('Portfolio item not found. It may have been deleted.');
         } else if (response.status === 401) {
           setError('Authentication required. Please login again.');
         } else {
-          setError(`Failed to fetch portfolio item: ${response.status}`);
+          setError(`Failed to fetch portfolio item: ${response.status} - ${errorText}`);
         }
       }
     } catch (error) {
-      console.error('Error fetching portfolio item:', error);
+      console.error('❌ Fetch error:', error);
+      console.error('Error type:', error.constructor.name);
+      console.error('Error message:', error.message);
       setError(`Network error: ${error.message}`);
     }
   };
