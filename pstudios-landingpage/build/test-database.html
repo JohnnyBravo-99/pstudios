@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Database Test</title>
+</head>
+<body>
+    <h1>Portfolio Database Test</h1>
+    <button onclick="testDatabase()">Test Database</button>
+    <div id="results"></div>
+    
+    <script>
+        async function testDatabase() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing database...</p>';
+            
+            try {
+                // Test 1: Health Check
+                const health = await fetch('https://api.paradigmstudios.art/api/health');
+                const healthData = await health.json();
+                results.innerHTML += `<p>✅ Health: ${health.status} - ${JSON.stringify(healthData)}</p>`;
+                
+                // Test 2: Auth Check
+                const auth = await fetch('https://api.paradigmstudios.art/api/auth/me', {
+                    credentials: 'include'
+                });
+                results.innerHTML += `<p>Auth Status: ${auth.status}</p>`;
+                
+                if (auth.ok) {
+                    const authData = await auth.json();
+                    results.innerHTML += `<p>✅ User: ${authData.user?.email}</p>`;
+                }
+                
+                // Test 3: Portfolio List
+                const list = await fetch('https://api.paradigmstudios.art/api/admin/portfolio', {
+                    credentials: 'include'
+                });
+                results.innerHTML += `<p>Portfolio List Status: ${list.status}</p>`;
+                
+                if (list.ok) {
+                    const items = await list.json();
+                    results.innerHTML += `<p>✅ Total Items: ${items.length}</p>`;
+                    results.innerHTML += `<p>Item IDs: ${items.map(item => item._id).join(', ')}</p>`;
+                    
+                    if (items.length > 0) {
+                        results.innerHTML += `<p>First Item: ${JSON.stringify(items[0], null, 2)}</p>`;
+                    }
+                } else {
+                    results.innerHTML += `<p>❌ Portfolio List Failed: ${list.status}</p>`;
+                }
+                
+            } catch (error) {
+                results.innerHTML += `<p>❌ Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
