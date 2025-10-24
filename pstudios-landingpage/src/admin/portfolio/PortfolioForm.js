@@ -65,22 +65,36 @@ function PortfolioForm() {
 
   const fetchItem = async () => {
     try {
+      console.log('Fetching portfolio item:', id);
+      console.log('API URL:', `${API_BASE_URL}/api/admin/portfolio/${id}`);
+      
       const response = await fetch(`${API_BASE_URL}/api/admin/portfolio/${id}`, {
         credentials: 'include',
       });
 
+      console.log('Fetch response status:', response.status);
+      console.log('Fetch response ok:', response.ok);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('Fetched item data:', data);
         setFormData(data);
         // Initialize uploaded media from the fetched item
         if (data.media && data.media.images) {
           setUploadedMedia(data.media.images);
         }
       } else {
-        setError('Failed to fetch portfolio item');
+        if (response.status === 404) {
+          setError('Portfolio item not found. It may have been deleted.');
+        } else if (response.status === 401) {
+          setError('Authentication required. Please login again.');
+        } else {
+          setError(`Failed to fetch portfolio item: ${response.status}`);
+        }
       }
     } catch (error) {
-      setError('Network error');
+      console.error('Error fetching portfolio item:', error);
+      setError(`Network error: ${error.message}`);
     }
   };
 
@@ -531,14 +545,10 @@ function PortfolioForm() {
         </div>
       </form>
 
-      <div className="form-section">
-        <h2>Media</h2>
-        <div className="media-uploader" style={{ padding: '20px', border: '2px dashed #ccc', borderRadius: '8px', textAlign: 'center' }}>
-          <h3>Media Uploader Test</h3>
-          <p>Item ID: {id}</p>
-          <p>This should be visible in edit mode</p>
-          <input type="file" accept="image/*,video/*,.glb" style={{ marginTop: '10px' }} />
-        </div>
+      {isEdit && (
+        <div className="form-section">
+          <h2>Media</h2>
+          <MediaUploader itemId={id} onUploadSuccess={handleMediaUploadSuccess} onUploadComplete={refetchMedia} />
           
           {/* Display uploaded media */}
           {uploadedMedia.length > 0 && (
@@ -571,6 +581,7 @@ function PortfolioForm() {
             </div>
           )}
         </div>
+      )}
     </div>
   );
 }
