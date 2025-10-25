@@ -4,8 +4,8 @@
   left: 0;
   right: 0;
   width: 100%;
-  /* Dark gray radial gradient with lighter corners */
-  background: radial-gradient(ellipse at center, #cccccc 0%, #999999 70%, #676767 100%);
+  /* Inverted gradient: dark center with lighter edges */
+  background: radial-gradient(ellipse at center, #676767 0%, #999999 70%, #cccccc 100%);
   /* Accent blue glow on outside-bottom edge */
   box-shadow: 0 2px 8px lab(16.59% 0 0 / 0.4), 0 4px 16px rgba(51, 153, 204, 0.3), 0 8px 32px rgba(51, 153, 204, 0.2);
   /* Removed backdrop-filter to prevent text blur */
@@ -14,9 +14,9 @@
 }
 
 .nav-container {
-  max-width: 1400px;
+  max-width: var(--max-width-2xl);
   margin: 0 auto;
-  padding: 0.75rem 1rem;
+  padding: var(--spacing-sm) var(--spacing-md);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -42,8 +42,8 @@
 
 .header-vertical-logo {
   width: auto;
-  height: 40px; /* Desktop size */
-  max-width: 250px; /* Prevent overflow on smaller desktop screens */
+  height: 60px; /* Further increased desktop size for better visibility */
+  max-width: 350px; /* Further increased max width for better scaling */
   display: block;
   object-fit: contain;
   transition: opacity 0.3s ease;
@@ -58,7 +58,7 @@
 .logo-paradigm {
   font-family: 'Beckan', sans-serif;
   color: var(--color-secondary);
-  font-size: var(--fs-2); /* ≈22.7px from 14px base */
+  font-size: var(--font-size-3xl); /* Enhanced from 2xl to 3xl for even better desktop display */
   letter-spacing: 0.05em; /* More dramatic tracking to prevent letters touching */
   font-feature-settings: "kern" 1, "liga" 1;
   -webkit-font-feature-settings: "kern" 1, "liga" 1;
@@ -71,20 +71,20 @@
 .logo-studios {
   font-family: 'Beckan', sans-serif;
   color: var(--color-secondary);
-  font-size: var(--fs-2); /* ≈22.7px from 14px base */
+  font-size: var(--font-size-3xl); /* Enhanced from 2xl to 3xl for even better desktop display */
   letter-spacing: 0.05em; /* More dramatic tracking to prevent letters touching */
   font-feature-settings: "kern" 1, "liga" 1;
   -webkit-font-feature-settings: "kern" 1, "liga" 1;
   text-rendering: optimizeLegibility;
   /* Ensure precise color matching */
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing:grayscale;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .nav-menu {
   display: flex;
   list-style: none;
-  gap: 2.5rem;
+  gap: var(--spacing-2xl);
   margin: 0;
   padding: 0;
   align-items: center;
@@ -97,9 +97,9 @@
 .nav-link {
   color: rgba(255, 255, 255, 0.9);
   text-decoration: none;
-  font-size: 1rem;
+  font-size: var(--font-size-xl);
   font-weight: 500;
-  padding: 0.5rem 0;
+  padding: var(--spacing-sm) 0;
   transition: color 0.3s ease;
   position: relative;
   font-feature-settings: "kern" 1, "liga" 1;
@@ -117,7 +117,7 @@
   bottom: -2px;
   left: 0;
   width: 0;
-  height: 3px; /* Slightly thicker for better visibility */
+  height: 4px; /* Increased thickness for better visibility with larger text */
   background: #4db8ff; /* Brighter, more visible blue */
   box-shadow: 0 0 8px rgba(77, 184, 255, 0.6); /* Matching bright blue glow */
   transition: width 0.3s ease, box-shadow 0.3s ease;
@@ -141,23 +141,23 @@
 @media (max-width: 768px) {
   .nav-container {
     flex-direction: column;
-    gap: 1.5rem;
-    padding: 1rem;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-md);
   }
 
   .nav-menu {
-    gap: 1.5rem;
+    gap: var(--spacing-lg);
     flex-wrap: wrap;
     justify-content: center;
   }
 
   .header-vertical-logo {
-    height: 35px; /* Properly sized for mobile */
+    height: 45px; /* Further increased mobile size for better visibility */
     width: auto;
-    max-width: 200px; /* Prevent overflow on small screens */
+    max-width: 280px; /* Further increased max width for better scaling */
   }
 
   .nav-link {
-    font-size: 0.9rem;
+    font-size: var(--font-size-lg);
   }
 }

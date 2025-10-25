@@ -10,14 +10,14 @@ This implementation follows the comprehensive font optimization guide provided, 
 
 **Implementation:**
 - Updated `@font-face` declarations in `src/styles/variables.css`
-- Now using `Beckan Regular.woff2` and `Beckan Oblique.woff2`
+- Now using `Beckan.woff2` and `Beckan Oblique.woff2`
 - Removed old TTF declarations from `App.css` and `BackgroundVideo.css`
 
 **Key Features:**
 ```css
 @font-face {
   font-family: 'Beckan';
-  src: url('../assets/fonts/Beckan Regular.woff2') format('woff2');
+  src: url('../assets/fonts/Beckan.woff2') format('woff2');
   font-weight: 100 400;
   font-style: normal;
   font-display: swap;
@@ -146,13 +146,8 @@ h1, h2, h3, h4, h5, h6, p, a, span {
 
 ## 6. ✅ Font Preloading & Cache Headers
 
-### Preload Links Added (in `public/index.html`):
-```html
-<link rel="preload" href="/static/media/Beckan Regular.woff2" 
-      as="font" type="font/woff2" crossorigin="anonymous" />
-<link rel="preload" href="/static/media/Beckan Oblique.woff2" 
-      as="font" type="font/woff2" crossorigin="anonymous" />
-```
+### Preload Link Added (in `public/index.html`):
+- `<link rel="preload" href="%PUBLIC_URL%/fonts/Beckan.woff2" as="font" type="font/woff2" crossorigin="anonymous" />`
 
 ### Cache Configuration Files Created:
 

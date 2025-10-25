@@ -180,6 +180,11 @@ For development issues:
 ## 🔄 RECENT UPDATES
 
 ### Latest Changes
+- ✅ **Media URL Resolver**: Normalizes `/media/...` paths to API host for dev/prod
+- ✅ **Multi-file Uploads**: Admin uploader supports selecting/dropping multiple files
+- ✅ **Modal Detail Fetch**: Portfolio modal fetches full item by slug to show meta/links
+- ✅ **Font Preload Fix**: Preloads `public/fonts/Beckan.woff2` with correct path
+- ✅ **GitHub Pages Deploy**: `npm run deploy` publishes build to `gh-pages`
 - ✅ **Square Portfolio Cards**: Implemented perfect 1:1 aspect ratio
 - ✅ **Image Previews**: First uploaded image shows in each card
 - ✅ **File Organization**: Moved all CSS files to `src/styles/` directory
@@ -192,3 +197,4 @@ For development issues:
 - Enhanced portfolio filtering
 - Contact form implementation
 - Performance optimizations
+- Backend note: Ensure CORS allows `https://www.paradigmstudios.art` with credentials and `/media` static files are served.

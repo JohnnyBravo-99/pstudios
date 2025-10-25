@@ -101,6 +101,7 @@
   /* Font Families */
   --font-primary: 'Beckan', sans-serif;
   --font-secondary: 'Playfair-Display', serif;
+  --font-tertiary: 'Source Sans Variable', sans-serif;
   --font-fallback: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   
   /* Golden ratio modular scale (base 14px) */

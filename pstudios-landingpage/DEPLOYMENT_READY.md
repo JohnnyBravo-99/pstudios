@@ -201,11 +201,7 @@ npx lighthouse http://localhost:3000 --view
 ### After deploying to production:
 
 1. **Font Loading**
-   ```bash
-   # Check if fonts are loading
-   curl -I https://your-production-url.com/static/media/Beckan\ Regular.woff2
-   ```
-   **Expected:** Status 200, Cache-Control header present
+   - Verify Beckan preload path is `public/fonts/Beckan.woff2` and loads with 200.
 
 2. **Preload Working**
    - View page source in browser
@@ -357,16 +353,12 @@ All requirements met. Your site is ready for production deployment with professi
 - [x] Cache headers for all server types
 - [x] Comprehensive testing documentation
 
-### Deploy Command:
-```bash
-# Build
-npm run build
-
-# Deploy (choose your platform)
-# Netlify: netlify deploy --prod
-# Vercel: vercel --prod
-# Manual: Upload build/ folder to your server
-```
+### Deploy Commands (GitHub Pages):
+1. From repo root: commit changes to `main` and push.
+2. Build and publish:
+   - `cd pstudios-landingpage`
+   - `npm run build`
+   - `npm run deploy` (publishes `build/` to `gh-pages`)
 
 ---
 

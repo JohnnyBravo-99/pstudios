@@ -8,28 +8,29 @@ function About() {
         <div className="about-section">
           <h2 className="section-title">Our Mission</h2>
           <p className="section-content">
-            At Paradigm Studios, we craft next-generation visual experiences that push the boundaries of digital artistry.
-            From immersive game worlds to striking brand identities, our mission is to transform creative visions into
-            stunning realities that captivate and inspire.
+          Paradigm Studios exists to forge meaningful visual identities and immersive digital worlds by blending artistic ingenuity 
+          with technical excellence. We collaborate with the talented to bring clarity, distinction, and imagination 
+          to the brands and worlds we help shape.
           </p>
         </div>
 
         <div className="about-section">
           <h2 className="section-title">Our Approach</h2>
           <p className="section-content">
-            Every project begins with deep collaboration and strategic thinking. We blend artistic intuition with
-            technical precision, ensuring that each design serves both aesthetic beauty and functional purpose.
-            Our process is transparent, iterative, and always client-focused.
+            Every project begins with immersive discovery. We collaborate 
+            deeply with our clients to translate ambitions into experiences, 
+            then sculpt bold, intelligent visuals that elevate brands into 
+            the future."
           </p>
         </div>
 
         <div className="about-section">
           <h2 className="section-title">Our Manifesto</h2>
           <p className="section-content">
-            Design is not just about making things look beautiful—it's about creating experiences that matter.
-            We believe in the power of visual storytelling, the importance of pixel-perfect execution, and the
-            endless potential of creative collaboration. Every project is an opportunity to innovate, inspire,
-            and leave a lasting impression.
+          At Paradigm Studios, we believe design is more than craft — it is catalyst.
+          It is a catalyst for connection, imagination, and evolution.
+          We build brands not only to be seen, but to be remembered, trusted, and celebrated.
+          The future belongs to those bold enough to shape it — and we are here to help shape yours.
           </p>
         </div>
 
