@@ -27,17 +27,41 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// CORS configuration
+// CORS configuration - Enhanced for mobile compatibility
 app.use(cors({
-  origin: [
-    process.env.CLIENT_ORIGIN || 'http://localhost:3000',
-    'https://www.paradigmstudios.art',           // ← Your actual domain
-    'https://paradigmstudios.art',               // ← Without www
-    'https://johnnybravo-99.github.io',         // ← Keep for backup
-    'https://johnnybravo-99.github.io/pstudios' // ← Keep for backup
-  ],
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      process.env.CLIENT_ORIGIN || 'http://localhost:3000',
+      'https://www.paradigmstudios.art',
+      'https://paradigmstudios.art',
+      'https://johnnybravo-99.github.io',
+      'https://johnnybravo-99.github.io/pstudios',
+      // Add common mobile browser origins
+      'http://localhost:3001',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:3001'
+    ];
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      // Log the origin for debugging
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
+  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
 }));
+
+// Handle preflight requests explicitly for mobile browsers
+app.options('*', cors());
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));

@@ -94,20 +94,9 @@ curl -X POST http://localhost:3000/api/auth/login \
 ```
 
 ### 6. Frontend Configuration
-Update the frontend API configuration in `pstudios-landingpage/src/pages/Portfolio.js`:
-
-```javascript
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://api.yourdomain.com'  // Your actual API domain
-  : 'http://localhost:3000';
-```
-
-And in admin components:
-```javascript
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://api.yourdomain.com'  // Your actual API domain
-  : 'http://localhost:3000';
-```
+- Frontend reads API base from `pstudios-landingpage/src/config/api.js`.
+- Production: `https://api.paradigmstudios.art`
+- Development: `http://localhost:3001` (dev mock server) or `REACT_APP_API_URL` if provided.
 
 ## API Endpoints
 
@@ -220,13 +209,19 @@ docker compose exec mongo mongosh --eval "db.adminCommand('ping')"
    # Check for MongoDB connection issues
    ```
 
-2. **CORS Errors**
-   - Verify CLIENT_ORIGIN in envs/api.env
-   - Check CORS configuration in src/index.js
+2. **CORS Errors (Uploads/Admin)**
+   - Ensure CORS is applied before routes with:
+     - origin: [`https://www.paradigmstudios.art`, `https://paradigmstudios.art`]
+     - credentials: true
+     - app.options('*', cors(...)) for preflight
+   - Set auth cookie with SameSite=None; Secure; Domain=.paradigmstudios.art
+   - Reverse proxy must return CORS headers on OPTIONS and proxied errors
 
 3. **File Upload Issues**
-   - Check uploads directory permissions
-   - Verify file type restrictions
+   - Check uploads directory exists and is writable (`UPLOAD_DIR`)
+   - Verify file size limits (proxy and multer) are ≥ 50MB
+   - Ensure route pushes to `item.media.images` and saves, not overwrite
+   - Response should include `/media/portfolio/<id>/<file>` path
 
 4. **Authentication Issues**
    - Verify JWT_SECRET is set

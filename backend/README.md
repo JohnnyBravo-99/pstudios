@@ -146,9 +146,11 @@ npm test
 
 1. Set `NODE_ENV=production`
 2. Use a strong `JWT_SECRET`
-3. Configure proper CORS origins
-4. Set up file upload directory
-5. Use HTTPS in production
+3. Configure proper CORS origins (include `https://www.paradigmstudios.art` and `https://paradigmstudios.art`) with `credentials: true` and preflight support
+4. Set up file upload directory (`UPLOAD_DIR`) and ensure it is writable and persistent
+5. Serve uploads with `app.use('/media', express.static(UPLOAD_DIR))`
+6. Set auth cookie with `SameSite=None; Secure; Domain=.paradigmstudios.art; Path=/` to enable cross-site admin uploads
+7. Use HTTPS in production
 
 ## File Uploads
 
@@ -160,6 +162,12 @@ Supported file types:
 - 3D Models: GLB, GLTF
 
 File size limit: 50MB
+
+Upload response shape (one of):
+- Preferred: `{ "media": { "_id": "...", "src": "/media/portfolio/<id>/<file>", "alt": "..." } }`
+- Legacy: `{ "file": { "url": "/media/portfolio/<id>/<file>", "filename": "...", "mimetype": "..." } }`
+
+The upload route should append to `item.media.images` and `save()` (do not overwrite the array).
 
 ## Security Features
 

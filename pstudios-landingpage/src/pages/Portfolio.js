@@ -205,50 +205,113 @@ function Portfolio() {
 
   const fetchPortfolioItems = async () => {
     try {
+      // Enhanced fetch with mobile-specific configurations
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
       const response = await fetch(`${API_BASE_URL}/api/portfolio`, {
+        method: 'GET',
         credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal,
+        // Mobile-specific configurations
+        cache: 'no-cache',
+        mode: 'cors'
       });
+      
+      clearTimeout(timeoutId);
+      
       if (response.ok) {
         const data = await response.json();
         setItems(data);
+        setError(''); // Clear any previous errors
       } else {
-        setError('Failed to load portfolio items');
+        console.error('API response not ok:', response.status, response.statusText);
+        setError(`Failed to load portfolio items (${response.status})`);
+        // Try without credentials for mobile fallback
+        await fetchPortfolioItemsWithoutCredentials();
       }
     } catch (err) {
       console.error('Error fetching portfolio items:', err);
-      // Fallback to demo data when API is not available
-      const demoItems = Array.from({ length: 9 }, (_, i) => ({
-        _id: i + 1,
-        title: `Project ${i + 1}`,
-        type: i % 2 === 0 ? '3d-asset' : 'branding',
-        tags: i % 2 === 0 ? ['PBR', 'Realtime'] : ['Logo', 'Guidelines'],
-        meta: i % 2 === 0
-          ? {
-              role: 'Modeling, Texturing',
-              year: 2025,
-              engine: 'Unity 2022 LTS',
-              software: ['Blender', 'Substance 3D Painter'],
-              polycount: '12,340 tris',
-              maps: ['BaseColor', 'Normal', 'Roughness', 'AO'],
-              texelDensity: '10.24 px/cm',
-              fileTypes: ['FBX', 'GLB', 'PNG']
-            }
-          : {
-              role: 'Identity, System',
-              year: 2025,
-              software: ['Illustrator', 'Photoshop'],
-              fileTypes: ['SVG', 'PDF', 'PNG']
-            },
-        media: {
-          images: []
-        },
-        links: {}
-      }));
-      setItems(demoItems);
-      setError('API not available - showing demo data');
+      
+      // Check if it's a network error (common on mobile)
+      if (err.name === 'AbortError') {
+        setError('Request timed out - please check your connection');
+      } else if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        setError('Network error - please check your connection');
+        // Try without credentials as fallback
+        await fetchPortfolioItemsWithoutCredentials();
+      } else {
+        setError('Failed to load portfolio items');
+        // Fallback to demo data
+        loadDemoData();
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchPortfolioItemsWithoutCredentials = async () => {
+    try {
+      console.log('Trying without credentials for mobile compatibility...');
+      const response = await fetch(`${API_BASE_URL}/api/portfolio`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-cache',
+        mode: 'cors'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setItems(data);
+        setError(''); // Clear error on success
+        console.log('Successfully loaded portfolio without credentials');
+      } else {
+        console.log('Fallback also failed, loading demo data');
+        loadDemoData();
+      }
+    } catch (err) {
+      console.log('Fallback request failed:', err);
+      loadDemoData();
+    }
+  };
+
+  const loadDemoData = () => {
+    const demoItems = Array.from({ length: 9 }, (_, i) => ({
+      _id: i + 1,
+      title: `Project ${i + 1}`,
+      type: i % 2 === 0 ? '3d-asset' : 'branding',
+      tags: i % 2 === 0 ? ['PBR', 'Realtime'] : ['Logo', 'Guidelines'],
+      meta: i % 2 === 0
+        ? {
+            role: 'Modeling, Texturing',
+            year: 2025,
+            engine: 'Unity 2022 LTS',
+            software: ['Blender', 'Substance 3D Painter'],
+            polycount: '12,340 tris',
+            maps: ['BaseColor', 'Normal', 'Roughness', 'AO'],
+            texelDensity: '10.24 px/cm',
+            fileTypes: ['FBX', 'GLB', 'PNG']
+          }
+        : {
+            role: 'Identity, System',
+            year: 2025,
+            software: ['Illustrator', 'Photoshop'],
+            fileTypes: ['SVG', 'PDF', 'PNG']
+          },
+      media: {
+        images: []
+      },
+      links: {}
+    }));
+    setItems(demoItems);
+    setError('API not available - showing demo data');
   };
 
   const closeModal = () => setActiveItem(null);
@@ -266,7 +329,11 @@ function Portfolio() {
   if (loading) {
     return (
       <div className="page-container portfolio-page">
-        <div className="loading">Loading portfolio...</div>
+        <div className="loading">
+          <div className="loading-spinner"></div>
+          <p>Loading portfolio...</p>
+          <p className="loading-subtitle">This may take a moment on mobile devices</p>
+        </div>
       </div>
     );
   }
@@ -274,7 +341,23 @@ function Portfolio() {
   if (error) {
     return (
       <div className="page-container portfolio-page">
-        <div className="error-message">{error}</div>
+        <div className="error-message">
+          <h3>Unable to Load Portfolio</h3>
+          <p>{error}</p>
+          <button 
+            className="retry-button" 
+            onClick={() => {
+              setLoading(true);
+              setError('');
+              fetchPortfolioItems();
+            }}
+          >
+            Try Again
+          </button>
+          <p className="error-help">
+            If this persists, please check your internet connection or try refreshing the page.
+          </p>
+        </div>
       </div>
     );
   }
