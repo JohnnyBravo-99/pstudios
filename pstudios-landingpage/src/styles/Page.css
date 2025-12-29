@@ -104,11 +104,25 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .page-container {
-    padding-top: var(--header-height-mobile); /* More space for mobile header */
+    padding-top: var(--header-height-mobile); /* Consistent spacing for mobile header */
   }
 
   .about-page {
-    padding-top: var(--header-height-mobile); /* More space for mobile header */
+    padding-top: var(--header-height-mobile); /* Consistent spacing for mobile header */
+  }
+
+  /* Ensure portfolio modal content is not covered by header */
+  .portfolio-modal {
+    padding-top: var(--header-height-mobile);
+  }
+
+  .portfolio-modal-content {
+    margin-top: var(--spacing-lg);
+  }
+
+  /* Ensure portfolio detail content has proper spacing */
+  .portfolio-detail {
+    padding-top: var(--spacing-md);
   }
 
   .page-content {
@@ -572,6 +586,119 @@
   color: var(--color-white-transparent-90);
 }
 
+/* Home Blog Container - Centered in viewport */
+.home-blog-container {
+  min-height: 100vh;
+  padding-top: calc(var(--header-height) + var(--spacing-xl)); /* Header + ratio-scaled spacing */
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  z-index: var(--z-index-content);
+  width: 100%;
+}
+
+/* Blog Feed - Centered, max-width constrained */
+.blog-feed {
+  width: 100%;
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+  padding: 0 var(--spacing-xl);
+}
+
+.blog-feed-title {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+  color: var(--color-white);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-heading);
+}
+
+.blog-posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  width: 100%;
+}
+
+.blog-post-card {
+  padding: var(--spacing-xl);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.blog-post-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.blog-post-image,
+.blog-post-video {
+  margin-bottom: var(--spacing-lg);
+}
+
+.blog-post-image img,
+.blog-post-video video {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  border-radius: var(--border-radius-sm);
+}
+
+.blog-post-meta {
+  font-size: var(--font-size-sm);
+  color: var(--color-white-transparent-80);
+  margin-bottom: var(--spacing-sm);
+}
+
+.blog-post-subject {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-white);
+  font-size: var(--font-size-3xl);
+}
+
+.blog-post-title {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--spacing-md);
+  color: var(--color-white);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-heading);
+}
+
+.blog-post-body {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-white-transparent-90);
+  white-space: pre-wrap;
+}
+
+/* Positioned Images - Public View */
+/* Positioned images are rendered with fixed positioning and proper z-index layering */
+/* Blog post cards have base z-index, positioned images can be behind (negative) or in front (positive) */
+.blog-post-card {
+  position: relative;
+  z-index: 10; /* Base z-index for blog post cards */
+}
+
+/* Ensure positioned images don't interfere with page layout */
+.home-blog-container {
+  position: relative;
+}
+
+/* Positioned images behind posts (negative z-index) */
+.positioned-image-behind {
+  z-index: -1;
+}
+
+/* Positioned images in front of posts (positive z-index) */
+.positioned-image-front {
+  z-index: 20;
+}
+
 .about-page .page-content {
   margin-top: var(--spacing-xl);
 }
@@ -606,7 +733,7 @@
   font-family: var(--font-primary);
   font-size: clamp(var(--font-size-4xl), 3vw, var(--font-size-6xl));
   font-weight: var(--font-weight-thin);
-  color: var(--color-secondary);
+  color: var(--color-primary);
   margin-bottom: var(--spacing-md);
   letter-spacing: var(--letter-spacing-heading);
   text-align: center;
@@ -866,7 +993,7 @@
   }
   
   .media-fullscreen-overlay {
-    top: var(--header-height-mobile); /* taller header on mobile */
+    top: var(--header-height-mobile); /* consistent header height on mobile */
     height: calc(100vh - var(--header-height-mobile));
     --thumbs-h: 100px;
   }
@@ -874,6 +1001,28 @@
   .fullscreen-media {
     max-width: 94vw;
     max-height: calc(100% - 20px);
+  }
+
+  /* Mobile portfolio modal improvements */
+  .portfolio-modal-content {
+    max-height: calc(100vh - var(--header-height-mobile) - var(--spacing-2xl));
+    overflow-y: auto;
+    margin: var(--spacing-md);
+    border-radius: var(--border-radius-lg);
+  }
+
+  .portfolio-detail {
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .portfolio-info {
+    order: 2;
+    padding: var(--spacing-lg);
+  }
+
+  .portfolio-media {
+    order: 1;
   }
   
   .fullscreen-nav {

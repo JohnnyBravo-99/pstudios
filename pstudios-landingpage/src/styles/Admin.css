@@ -603,6 +603,117 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
+/* Form Label with Flex */
+.form-label-flex {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Uploaded Media Display */
+.uploaded-media {
+  margin-top: 1rem;
+}
+
+.uploaded-media h3 {
+  color: var(--color-white);
+  margin-bottom: 1rem;
+}
+
+.media-preview {
+  margin-bottom: 1rem;
+}
+
+.media-preview p {
+  color: var(--color-white);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.media-preview img,
+.media-preview video {
+  max-width: 300px;
+  max-height: 200px;
+  object-fit: contain;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: block;
+}
+
+.media-preview .delete-button {
+  margin-top: 0.5rem;
+}
+
+/* Positioned Images Section */
+.positioned-images-info {
+  margin-bottom: 1rem;
+  color: #666;
+}
+
+.positioned-images-list {
+  margin-bottom: 1rem;
+}
+
+.positioned-images-list h3 {
+  color: var(--color-white);
+  margin-bottom: 1rem;
+}
+
+.positioned-images-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.positioned-image-item {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.5rem;
+  max-width: 200px;
+}
+
+.positioned-image-item img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  display: block;
+}
+
+.positioned-image-item p {
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  color: var(--color-white);
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.modal-content-wrapper {
+  background-color: #fff;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 1400px;
+  max-height: 90vh;
+  overflow: auto;
+}
+
+/* Submit Button Spacing */
+.submit-button-spaced {
+  margin-bottom: 1rem;
+}
+
 /* Utility Classes */
 .loading {
   text-align: center;

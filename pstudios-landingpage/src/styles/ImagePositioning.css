@@ -1,0 +1,375 @@
+/* Image Positioning Editor Styles */
+
+.image-positioning-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: #2a2a2a;
+}
+
+.editor-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.close-button {
+  padding: 0.5rem 1rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.close-button:hover {
+  background: #c82333;
+}
+
+.editor-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.editor-sidebar {
+  width: 300px;
+  background: #2a2a2a;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.sidebar-section {
+  margin-bottom: 2rem;
+}
+
+.sidebar-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.5rem;
+}
+
+.available-images-list,
+.positioned-images-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.available-image-item,
+.positioned-image-item {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.positioned-image-item.selected {
+  border-color: #006699;
+  background: rgba(0, 102, 153, 0.2);
+}
+
+.available-image-item:hover,
+.positioned-image-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.available-image-item img,
+.positioned-image-item img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.add-image-button {
+  width: 100%;
+  padding: 0.5rem;
+  background: #006699;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.add-image-button:hover {
+  background: #005588;
+}
+
+.image-info {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0.5rem 0;
+}
+
+.image-info p {
+  margin: 0.25rem 0;
+}
+
+.delete-button {
+  width: 100%;
+  padding: 0.5rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.delete-button:hover {
+  background: #c82333;
+}
+
+.editor-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.viewport-container {
+  flex: 1;
+  position: relative;
+  background: #1a1a1a;
+  overflow: hidden;
+  min-height: 500px;
+}
+
+.viewport-preview {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: linear-gradient(45deg, #1a1a1a 25%, transparent 25%),
+              linear-gradient(-45deg, #1a1a1a 25%, transparent 25%),
+              linear-gradient(45deg, transparent 75%, #1a1a1a 75%),
+              linear-gradient(-45deg, transparent 75%, #1a1a1a 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.blog-post-preview {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.blog-post-preview h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.editor-controls {
+  padding: 1rem 1.5rem;
+  background: #2a2a2a;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.control-group {
+  margin-bottom: 1rem;
+}
+
+.control-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.position-inputs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.position-inputs input {
+  flex: 1;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.control-group input[type="number"] {
+  width: 100%;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.z-index-toggle {
+  padding: 0.5rem 1rem;
+  background: #006699;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-right: 0.5rem;
+}
+
+.z-index-toggle:hover {
+  background: #005588;
+}
+
+.z-index-value {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.control-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.save-button,
+.cancel-button {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.save-button {
+  background: #28a745;
+  color: white;
+}
+
+.save-button:hover {
+  background: #218838;
+}
+
+.cancel-button {
+  background: #6c757d;
+  color: white;
+}
+
+.cancel-button:hover {
+  background: #5a6268;
+}
+
+/* Positioning Gizmo Styles */
+
+.positioning-gizmo {
+  pointer-events: all;
+  user-select: none;
+}
+
+.gizmo-wireframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px solid #006699;
+  box-shadow: 0 0 0 1px rgba(0, 102, 153, 0.3);
+  pointer-events: none;
+}
+
+.gizmo-handle {
+  position: absolute;
+  background: #006699;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  pointer-events: all;
+  z-index: 1001;
+}
+
+.gizmo-handle:hover {
+  background: #005588;
+  transform: scale(1.2);
+  box-shadow: 0 0 8px rgba(0, 102, 153, 0.6);
+}
+
+.gizmo-handle-top-left {
+  cursor: nw-resize;
+}
+
+.gizmo-handle-top-right {
+  cursor: ne-resize;
+}
+
+.gizmo-handle-bottom-left {
+  cursor: sw-resize;
+}
+
+.gizmo-handle-bottom-right {
+  cursor: se-resize;
+}
+
+.gizmo-handle-top-center {
+  cursor: n-resize;
+}
+
+.gizmo-handle-bottom-center {
+  cursor: s-resize;
+}
+
+.gizmo-handle-left-center {
+  cursor: w-resize;
+}
+
+.gizmo-handle-right-center {
+  cursor: e-resize;
+}
+
+/* Public view positioned images */
+.positioned-image {
+  position: fixed;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+.positioned-image-behind {
+  z-index: -1;
+}
+
+.positioned-image-front {
+  z-index: 10;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
