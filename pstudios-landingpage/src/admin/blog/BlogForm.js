@@ -149,8 +149,8 @@ function BlogForm() {
       const url = isEdit ? `${API_BASE_URL}/api/admin/blog/${id}` : `${API_BASE_URL}/api/admin/blog`;
       const method = isEdit ? 'PATCH' : 'POST';
 
-      // Exclude 'media' field from request body - backend schema doesn't allow it
-      const { media, ...submitData } = formData;
+      // Filter out MongoDB-generated fields that shouldn't be sent in updates
+      const { _id, __v, createdAt, updatedAt, slug, media, ...submitData } = formData;
 
       const response = await fetch(url, {
         method,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import MediaUploader from './MediaUploader';
+import MediaUploader from '../../components/MediaUploader';
 import { resolveMediaUrl } from '../../utils/media';
 import '../../styles/Admin.css';
 import API_BASE_URL from '../../config/api';
@@ -196,13 +196,16 @@ function PortfolioForm() {
       const url = isEdit ? `${API_BASE_URL}/api/admin/portfolio/${id}` : `${API_BASE_URL}/api/admin/portfolio`;
       const method = isEdit ? 'PATCH' : 'POST';
 
+      // Filter out MongoDB-generated fields that shouldn't be sent in updates
+      const { _id, __v, createdAt, updatedAt, slug, media, ...cleanFormData } = formData;
+
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(formData),
+        body: JSON.stringify(cleanFormData),
       });
 
       const data = await response.json();
@@ -531,6 +534,8 @@ function PortfolioForm() {
         <h2>Media</h2>
         <MediaUploader
           itemId={id}
+          type="portfolio"
+          multiple={true}
           onUploadSuccess={(media) => {
             console.log('Media uploaded successfully:', media);
             // Add the new media to the local state
