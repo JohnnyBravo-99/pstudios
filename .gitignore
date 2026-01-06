@@ -4,12 +4,20 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Environment variables
+# Environment variables - NEVER commit these!
 .env
+.env.*
 .env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.production
 .env.production.local
+.env.vps
+backend/.env
+backend/.env.*
+backend/envs/
 
 # Logs
 logs/
@@ -141,3 +149,14 @@ docker-volumes/
 # Local development
 local/
 dev/
+
+# Build artifacts (should not be in source control)
+/build/
+/dist/
+/static/
+/ghp_tmp/
+*.map
+asset-manifest.json
+
+# Cursor debug logs
+.cursor/debug.log

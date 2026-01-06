@@ -13,18 +13,23 @@ function PortfolioList() {
   }, []);
 
   const fetchItems = async () => {
+    
     try {
+      
       const response = await fetch(`${API_BASE_URL}/api/admin/portfolio`, {
         credentials: 'include',
       });
 
       if (response.ok) {
         const data = await response.json();
+        
         setItems(data);
       } else {
+        
         setError('Failed to fetch portfolio items');
       }
     } catch (error) {
+      
       setError('Network error');
     } finally {
       setLoading(false);

@@ -16,6 +16,9 @@
   "scripts": {
     "start": "react-scripts start",
     "start:dev": "npx cross-env NODE_ENV=development PORT=3000 BROWSER=none react-scripts start",
+    "start:dev:local": "npx cross-env NODE_ENV=development REACT_APP_BACKEND_MODE=local PORT=3000 BROWSER=none react-scripts start",
+    "start:dev:backend": "npx cross-env NODE_ENV=development REACT_APP_BACKEND_MODE=local REACT_APP_API_URL=http://localhost:3001 PORT=3000 BROWSER=none react-scripts start",
+    "start:dev:production": "npx cross-env NODE_ENV=development REACT_APP_BACKEND_MODE=production PORT=3000 BROWSER=none react-scripts start",
     "start:admin": "npx cross-env NODE_ENV=development PORT=3000 BROWSER=none react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

@@ -4,28 +4,35 @@
   left: 0;
   right: 0;
   width: 100%;
+  min-height: calc(var(--header-height) + var(--spacing-md));
+  padding-top: var(--spacing-sm);
   /* Inverted gradient: dark center with lighter edges */
-  background: radial-gradient(ellipse at center, #676767 0%, #999999 70%, #cccccc 100%);
+  /*background: linear-gradient(0deg, #4a4a4a 0%, #676767 50%, #8a8a8a 100%);*/
   /* Accent blue glow on outside-bottom edge */
-  box-shadow: 0 2px 8px lab(16.59% 0 0 / 0.4), 0 4px 16px rgba(51, 153, 204, 0.3), 0 8px 32px rgba(51, 153, 204, 0.2);
+  /*box-shadow: 0 2px 8px lab(16.59% 0 0 / 0.4), 0 4px 16px rgba(51, 153, 204, 0.3), 0 8px 32px rgba(51, 153, 204, 0.2);*/
   /* Removed backdrop-filter to prevent text blur */
   z-index: 1000;
-  border-bottom: 1px solid rgba(51, 153, 204, 0.3);
+  /*border-bottom: 1px solid rgba(51, 153, 204, 0.3);*/
 }
 
 .nav-container {
-  max-width: var(--max-width-2xl);
-  margin: 0 auto;
-  padding: var(--spacing-sm) var(--spacing-md);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: var(--spacing-sm) 0 var(--spacing-sm) 0;
+  /* Remove max-width and margin auto - we want full width */
+  min-height: var(--header-height);
 }
 
 .logo-section {
-  flex-shrink: 0;
+  position: absolute;
+  left: 2rem; /* Slightly padded from left edge */
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
+  z-index: 1;
+  max-width: 200px; /* Prevent logo from expanding too far right */
 }
 
 .logo-link {
@@ -50,6 +57,31 @@
 }
 
 .header-vertical-logo:hover {
+  opacity: 1;
+}
+
+.header-square-logo {
+  width: 40px; /* Fixed width for square logo */
+  height: 40px; /* Fixed height for square logo */
+  max-width: 40px; /* Square aspect ratio - compact size */
+  display: block;
+  object-fit: contain;
+  transition: opacity 0.3s ease;
+}
+
+/* Constrain logo on medium screens to prevent overlap */
+@media (max-width: 1399px) {
+  .logo-section {
+    max-width: 60px; /* Constrain logo section width to prevent overlap */
+  }
+  
+  .header-vertical-logo {
+    max-width: 60px; /* Further constrain vertical logo if it shows */
+    height: 40px; /* Reduce height */
+  }
+}
+
+.header-square-logo:hover {
   opacity: 1;
 }
 
@@ -82,13 +114,19 @@
 }
 
 .nav-menu {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   list-style: none;
   gap: var(--spacing-2xl);
   margin: 0;
   padding: 0;
   align-items: center;
+  z-index: 1;
 }
+
 
 .nav-item {
   position: relative;
@@ -137,27 +175,172 @@
   box-shadow: 0 0 15px rgba(77, 184, 255, 0.8); /* Enhanced bright blue glow for active state */
 }
 
-/* Responsive Design */
+/* ========================================
+   HAMBURGER MENU STYLES
+   ======================================== */
+
+.hamburger-menu {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+  position: relative;
+}
+
+.hamburger-line {
+  width: 2rem;
+  height: 0.25rem;
+  background: var(--color-white);
+  border-radius: 10px;
+  transition: all 0.3s linear;
+  position: relative;
+  transform-origin: 1px;
+}
+
+.hamburger-menu.active .hamburger-line:first-child {
+  transform: rotate(45deg);
+}
+
+.hamburger-menu.active .hamburger-line:nth-child(2) {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.hamburger-menu.active .hamburger-line:nth-child(3) {
+  transform: rotate(-45deg);
+}
+
+/* ========================================
+   MOBILE NAVIGATION OVERLAY
+   ======================================== */
+
+.mobile-nav-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.mobile-nav-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-nav {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 400px;
+  background: var(--color-graphite-dark);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-2xl);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--color-graphite-veil);
+}
+
+.mobile-nav-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.mobile-nav-item {
+  text-align: center;
+}
+
+.mobile-nav-link {
+  display: block;
+  color: var(--color-white);
+  text-decoration: none;
+  font-size: var(--font-size-xl);
+  font-weight: 500;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.mobile-nav-link:hover {
+  background: var(--color-graphite-veil);
+  color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.mobile-nav-item.active .mobile-nav-link {
+  background: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: var(--shadow-primary);
+}
+
+.mobile-nav-item.active .mobile-nav-link:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
 @media (max-width: 768px) {
   .nav-container {
-    flex-direction: column;
-    gap: var(--spacing-lg);
     padding: var(--spacing-md);
   }
 
-  .nav-menu {
-    gap: var(--spacing-lg);
-    flex-wrap: wrap;
-    justify-content: center;
+  .logo-section {
+    left: 1rem; /* Less padding on mobile */
+    position: relative;
+    transform: none;
+    top: auto;
   }
 
-  .header-vertical-logo {
-    height: 45px; /* Further increased mobile size for better visibility */
+  .desktop-nav {
+    display: none;
+  }
+
+  .hamburger-menu {
+    display: flex;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .header-vertical-logo,
+  .header-square-logo {
+    height: 40px;
     width: auto;
-    max-width: 280px; /* Further increased max width for better scaling */
+    max-width: 40px; /* Square on mobile */
   }
+}
 
-  .nav-link {
-    font-size: var(--font-size-lg);
+@media (min-width: 769px) {
+  .mobile-nav-overlay {
+    display: none;
+  }
+  
+  .hamburger-menu {
+    display: none;
+  }
+  
+  .desktop-nav {
+    display: flex;
   }
 }

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import '../styles/Admin.css';
 import API_BASE_URL from '../config/api';
 
 function Login() {
   const [formData, setFormData] = useState({
-    email: '',
+    email: 'jarnold@paradigmstudios.art',
     password: ''
   });
   const [error, setError] = useState('');
@@ -37,7 +37,9 @@ function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        navigate('/admin');
+        // Use window.location to force a full page reload and ensure cookie is available
+        // This prevents race condition where AdminEntry checks auth before cookie is set
+        window.location.href = '/admin';
       } else {
         setError(data.error || 'Login failed');
       }
@@ -86,6 +88,19 @@ function Login() {
           <button type="submit" disabled={loading} className="login-button">
             {loading ? 'Logging in...' : 'Login'}
           </button>
+
+          <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+            <Link 
+              to="/admin/reset-password" 
+              style={{ 
+                color: 'var(--color-primary)', 
+                textDecoration: 'none',
+                fontSize: '0.9rem'
+              }}
+            >
+              Forgot Password?
+            </Link>
+          </div>
         </form>
       </div>
     </div>

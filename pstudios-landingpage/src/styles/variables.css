@@ -177,7 +177,7 @@
   
   /* Header */
   --header-height: 80px;
-  --header-height-mobile: 140px;
+  --header-height-mobile: 80px; /* Reduced from 140px to match desktop for hamburger menu */
   
   /* ===== BORDERS ===== */
   --border-radius-sm: 0.5rem;   /* 8px */

@@ -14,17 +14,22 @@ function AdminEntry() {
   }, []);
 
   const checkAuthentication = async () => {
+    
     try {
+      
       const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
         credentials: 'include',
       });
 
       if (response.ok) {
+        
         setIsAuthenticated(true);
       } else {
+        
         setIsAuthenticated(false);
       }
     } catch (error) {
+      
       console.error('Error checking authentication:', error);
       setIsAuthenticated(false);
     } finally {

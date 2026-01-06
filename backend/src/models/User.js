@@ -11,12 +11,24 @@ const userSchema = new mongoose.Schema({
   },
   passwordHash: {
     type: String,
-    required: true
+    required: false // Allow null for initial setup
   },
   role: {
     type: String,
     enum: ['admin', 'editor'],
     default: 'editor'
+  },
+  resetPasswordToken: {
+    type: String,
+    default: null
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: null
+  },
+  isPasswordSet: {
+    type: Boolean,
+    default: false
   },
   createdAt: {
     type: Date,
@@ -26,11 +38,13 @@ const userSchema = new mongoose.Schema({
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {
-  if (!this.isModified('passwordHash')) return next();
+  // Only hash if passwordHash is modified and not null
+  if (!this.isModified('passwordHash') || !this.passwordHash) return next();
   
   try {
     const salt = await bcrypt.genSalt(12);
     this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
+    this.isPasswordSet = true;
     next();
   } catch (error) {
     next(error);

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useDataCache } from '../context/DataCacheContext';
 import '../styles/Page.css';
 import API_BASE_URL from '../config/api';
 import { resolveMediaUrl } from '../utils/media';
 
 function PortfolioDetail({ item }) {
+  const { prefetchPortfolioItem, getPortfolioItem } = useDataCache();
   const [data, setData] = useState(item || {});
   const images = data?.media?.images || [];
   const [activeIndex, setActiveIndex] = useState(0);
@@ -36,23 +38,30 @@ function PortfolioDetail({ item }) {
 
   // Fetch full item by slug if list payload was minimal
   useEffect(() => {
-    let isMounted = true;
-    async function fetchFull() {
-      if (!item?.slug) return;
-      const missingDetails = !item?.meta || Object.keys(item.meta || {}).length === 0 || !item?.media || !Array.isArray(item.media.images);
-      if (!missingDetails) return;
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/portfolio/${item.slug}`);
-        if (res.ok) {
-          const full = await res.json();
-          if (isMounted) setData(full);
-        }
-      } catch (_) {}
+    if (!item?.slug) return;
+    
+    // Check cache first
+    const cached = getPortfolioItem(item.slug);
+    if (cached) {
+      setData(cached);
+      return;
     }
-    setData(item || {});
-    fetchFull();
-    return () => { isMounted = false; };
-  }, [item]);
+    
+    // Check if we need to fetch full details
+    const missingDetails = !item?.meta || Object.keys(item.meta || {}).length === 0 || !item?.media || !Array.isArray(item.media.images);
+    if (missingDetails) {
+      // Prefetch and update when available
+      prefetchPortfolioItem(item.slug).then(full => {
+        if (full) {
+          setData(full);
+        } else {
+          setData(item || {});
+        }
+      });
+    } else {
+      setData(item || {});
+    }
+  }, [item, prefetchPortfolioItem, getPortfolioItem]);
 
   return (
     <>
@@ -192,97 +201,64 @@ function PortfolioDetail({ item }) {
 }
 
 function Portfolio() {
+  const { getPortfolio, prefetchPortfolio, cache, prefetchPortfolioItem } = useDataCache();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeItem, setActiveItem] = useState(null);
 
-  // API configuration is imported from config/api.js
-
   useEffect(() => {
-    fetchPortfolioItems();
+    loadPortfolioData();
   }, []);
 
-  const fetchPortfolioItems = async () => {
-    try {
-      // Enhanced fetch with mobile-specific configurations
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-      
-      const response = await fetch(`${API_BASE_URL}/api/portfolio`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        signal: controller.signal,
-        // Mobile-specific configurations
-        cache: 'no-cache',
-        mode: 'cors'
-      });
-      
-      clearTimeout(timeoutId);
-      
-      if (response.ok) {
-        const data = await response.json();
-        setItems(data);
-        setError(''); // Clear any previous errors
-      } else {
-        console.error('API response not ok:', response.status, response.statusText);
-        setError(`Failed to load portfolio items (${response.status})`);
-        // Try without credentials for mobile fallback
-        await fetchPortfolioItemsWithoutCredentials();
-      }
-    } catch (err) {
-      console.error('Error fetching portfolio items:', err);
-      
-      // Check if it's a network error (common on mobile)
-      if (err.name === 'AbortError') {
-        setError('Request timed out - please check your connection');
-      } else if (err.name === 'TypeError' && err.message.includes('fetch')) {
-        setError('Network error - please check your connection');
-        // Try without credentials as fallback
-        await fetchPortfolioItemsWithoutCredentials();
-      } else {
-        setError('Failed to load portfolio items');
-        // Fallback to demo data
-        loadDemoData();
-      }
-    } finally {
+  const loadPortfolioData = async () => {
+    
+    setLoading(true);
+    
+    // Try to get from cache first
+    const cachedData = await getPortfolio();
+
+    if (cachedData && cachedData.length > 0) {
+      setItems(cachedData);
       setLoading(false);
+      setError('');
+      return;
     }
-  };
 
-  const fetchPortfolioItemsWithoutCredentials = async () => {
-    try {
-      console.log('Trying without credentials for mobile compatibility...');
-      const response = await fetch(`${API_BASE_URL}/api/portfolio`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        cache: 'no-cache',
-        mode: 'cors'
-      });
+    // If cache miss or empty, fetch fresh data
+    
+    const freshData = await prefetchPortfolio(true);
+
+    // Check if there's an actual API error
+    const hasApiError = cache.portfolio.error && freshData === null;
+    
+    if (hasApiError) {
       
-      if (response.ok) {
-        const data = await response.json();
-        setItems(data);
-        setError(''); // Clear error on success
-        console.log('Successfully loaded portfolio without credentials');
-      } else {
-        console.log('Fallback also failed, loading demo data');
-        loadDemoData();
-      }
-    } catch (err) {
-      console.log('Fallback request failed:', err);
-      loadDemoData();
+      setError(cache.portfolio.error || 'Failed to load portfolio items');
+      // Fallback to demo data on error (show error message)
+      loadDemoData(true);
+    } else if (freshData && freshData.length > 0) {
+      
+      setItems(freshData);
+      setError('');
+    } else {
+      
+      // Empty array is valid - just means no items in database yet
+      // Use demo data without showing error (pass false to loadDemoData)
+      loadDemoData(false);
+    }
+    
+    setLoading(false);
+  };
+
+  // Prefetch individual item on card hover
+  const handleCardHover = (item) => {
+    if (item?.slug) {
+      prefetchPortfolioItem(item.slug);
     }
   };
 
-  const loadDemoData = () => {
+  const loadDemoData = (showError = true) => {
     const demoItems = Array.from({ length: 9 }, (_, i) => ({
       _id: i + 1,
       title: `Project ${i + 1}`,
@@ -311,7 +287,11 @@ function Portfolio() {
       links: {}
     }));
     setItems(demoItems);
-    setError('API not available - showing demo data');
+    if (showError) {
+      setError('API not available - showing demo data');
+    } else {
+      setError(''); // Clear error when API is working but returns empty
+    }
   };
 
   const closeModal = () => setActiveItem(null);
@@ -349,7 +329,7 @@ function Portfolio() {
             onClick={() => {
               setLoading(true);
               setError('');
-              fetchPortfolioItems();
+              loadPortfolioData();
             }}
           >
             Try Again
@@ -372,6 +352,7 @@ function Portfolio() {
               key={item._id}
               className="portfolio-card"
               onClick={() => setActiveItem(item)}
+              onMouseEnter={() => handleCardHover(item)}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {

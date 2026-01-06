@@ -9,6 +9,8 @@ router.get('/', async (req, res) => {
     const items = await PortfolioItem.find({ isPublished: true })
       .sort({ order: 1, createdAt: -1 });
 
+    // Add cache headers
+    res.set('Cache-Control', 'public, max-age=300'); // 5 minutes
     res.json(items);
   } catch (error) {
     console.error('Error fetching portfolio items:', error);
@@ -28,6 +30,8 @@ router.get('/:slug', async (req, res) => {
       return res.status(404).json({ error: 'Portfolio item not found' });
     }
 
+    // Add cache headers
+    res.set('Cache-Control', 'public, max-age=300'); // 5 minutes
     res.json(item);
   } catch (error) {
     console.error('Error fetching portfolio item:', error);
