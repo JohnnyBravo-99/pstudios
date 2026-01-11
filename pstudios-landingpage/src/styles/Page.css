@@ -141,8 +141,16 @@
     font-size: var(--font-size-xl);
   }
 
+  .email-section {
+    padding: var(--spacing-md);
+    max-width: 100%;
+  }
+
   .email-link {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-lg);
+    padding: var(--spacing-xs) var(--spacing-md);
+    word-break: break-all;
+    max-width: 100%;
   }
 
   /* Mobile optimization for about content */
