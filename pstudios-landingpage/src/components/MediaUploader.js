@@ -214,6 +214,18 @@ function MediaUploader({
 
   const displayLabel = label || getItemTypeLabel();
 
+  // If no itemId, don't render the uploader at all
+  if (!itemId) {
+    return (
+      <div className="media-uploader">
+        <h3>{label || 'Media Uploader'}</h3>
+        <p style={{ color: 'rgba(255,255,255,0.7)', padding: '1rem 0' }}>
+          Save the item first before uploading media.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="media-uploader">
       <h3>{label || 'Media Uploader'}</h3>

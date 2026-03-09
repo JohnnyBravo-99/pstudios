@@ -30,10 +30,11 @@ const PORTFOLIO_TYPES = [
 ];
 
 function PortfolioForm() {
-  const { id: rawId } = useParams();
+  const { id: routeId } = useParams();
   const navigate = useNavigate();
-  // Treat "new" as create mode (e.g. from /admin/portfolio/new/edit)
-  const id = rawId === 'new' ? undefined : rawId;
+  const [savedItemId, setSavedItemId] = useState(null);
+  // Use route param first, then fall back to ID received after saving a new item
+  const id = (routeId && routeId !== 'new') ? routeId : savedItemId;
   const isEdit = Boolean(id);
 
   const [formData, setFormData] = useState({
@@ -233,13 +234,14 @@ function PortfolioForm() {
           setSuccess('Portfolio item updated successfully!');
           console.log('Portfolio item updated successfully');
         } else {
-          // For new items, redirect to edit mode to allow media upload
+          // For new items, store the ID immediately and redirect to edit mode
           const newItemId = data._id || data.id;
           if (newItemId) {
+            setSavedItemId(newItemId);
+            setFormData(prev => ({ ...prev, _id: newItemId }));
             setSuccess('Project created successfully! You can now upload media files.');
-            // Small delay to show success message before redirect
             setTimeout(() => {
-              navigate(`/admin/portfolio/${newItemId}/edit`);
+              navigate(`/admin/portfolio/${newItemId}/edit`, { replace: true });
             }, 1500);
           } else {
             navigate('/admin/portfolio');
@@ -548,11 +550,6 @@ function PortfolioForm() {
 
       <div className="form-section">
         <h2>Media</h2>
-        {!id ? (
-          <p style={{ color: 'rgba(255,255,255,0.8)', marginTop: '0.5rem' }}>
-            Save the project first to upload media. You&apos;ll be redirected to the edit page after saving.
-          </p>
-        ) : (
         <MediaUploader
           itemId={id}
           type="portfolio"
@@ -565,8 +562,7 @@ function PortfolioForm() {
           onUploadComplete={() => {
             console.log('Media upload completed');
           }}
-        />
-        )}
+        />}
           
           {/* Display uploaded media */}
           {uploadedMedia.length > 0 && (
