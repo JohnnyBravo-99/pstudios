@@ -5,6 +5,21 @@ import { resolveMediaUrl } from '../../utils/media';
 import '../../styles/Admin.css';
 import API_BASE_URL from '../../config/api';
 
+/** Build unified uploaded media array from API media (images + video + model3d) */
+function buildUploadedMediaFromApi(media) {
+  const items = [];
+  if (media.images && media.images.length) {
+    media.images.forEach(img => items.push({ ...img, mediaType: 'image' }));
+  }
+  if (media.video && media.video.src) {
+    items.push({ ...media.video, mediaType: 'video', _id: 'video' });
+  }
+  if (media.model3d && media.model3d.src) {
+    items.push({ ...media.model3d, mediaType: 'model3d', _id: 'model3d' });
+  }
+  return items;
+}
+
 const PORTFOLIO_TYPES = [
   '3d-asset',
   'branding', 
@@ -74,8 +89,8 @@ function PortfolioForm() {
         const data = await response.json();
         setFormData(data);
         // Initialize uploaded media from the fetched item
-        if (data.media && data.media.images) {
-          setUploadedMedia(data.media.images);
+        if (data.media) {
+          setUploadedMedia(buildUploadedMediaFromApi(data.media));
         }
       } else {
         setError('Failed to fetch portfolio item');
@@ -146,9 +161,8 @@ function PortfolioForm() {
       if (response.ok) {
         const data = await response.json();
         console.log('Refetched data:', data);
-        if (data.media && data.media.images) {
-          setUploadedMedia(data.media.images);
-          // Also update the formData to keep it in sync
+        if (data.media) {
+          setUploadedMedia(buildUploadedMediaFromApi(data.media));
           setFormData(prev => ({
             ...prev,
             media: data.media
@@ -537,10 +551,8 @@ function PortfolioForm() {
           type="portfolio"
           multiple={true}
           onUploadSuccess={(media) => {
-            console.log('Media uploaded successfully:', media);
-            // Add the new media to the local state
-            setUploadedMedia(prev => [...prev, media]);
-            // Also refetch to ensure state is synchronized
+            const item = media.mediaType ? media : { ...media, mediaType: media.mimetype?.startsWith('video/') ? 'video' : (media.mimetype?.includes('gltf') || (media.alt || '').toLowerCase().endsWith('.glb') ? 'model3d' : 'image') };
+            setUploadedMedia(prev => [...prev, item]);
             refetchMedia();
           }}
           onUploadComplete={() => {
@@ -555,25 +567,33 @@ function PortfolioForm() {
               <h3>Uploaded Media</h3>
               <div className="media-grid">
                 {uploadedMedia.map((media, index) => (
-                  <div key={media._id || index} className="media-item">
-                    <img src={resolveMediaUrl(media.src)} alt={media.alt} style={{ width: '100px', height: '100px', objectFit: 'cover' }} />
-                    <p>{media.alt}</p>
-                    <button 
-                      type="button" 
-                      onClick={() => handleDeleteMedia(media._id)}
-                      className="delete-media-btn"
-                      style={{ 
-                        background: '#dc3545', 
-                        color: 'white', 
-                        border: 'none', 
-                        padding: '4px 8px', 
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px'
-                      }}
-                    >
-                      Delete
-                    </button>
+                  <div key={media._id || media.src || index} className="media-item media-item-with-delete">
+                    <div className="media-item-preview">
+                      {media.mediaType === 'video' ? (
+                        <video
+                          src={resolveMediaUrl(media.src)}
+                          muted
+                          playsInline
+                          style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                        />
+                      ) : media.mediaType === 'model3d' ? (
+                        <div className="media-placeholder-3d" style={{ width: '100px', height: '100px', background: '#333', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>
+                          3D
+                        </div>
+                      ) : (
+                        <img src={resolveMediaUrl(media.src)} alt={media.alt} style={{ width: '100px', height: '100px', objectFit: 'cover' }} />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteMedia(media._id)}
+                        className="media-item-delete-x"
+                        aria-label="Delete"
+                        title="Delete"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <p>{media.alt || (media.mediaType === 'video' ? 'Video' : media.mediaType === 'model3d' ? '3D Model' : '')}</p>
                   </div>
                 ))}
               </div>

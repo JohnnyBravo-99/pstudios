@@ -110,9 +110,7 @@ function Header() {
           <li className={`nav-item ${isActive('/')}`}>
             <Link to="/" className="nav-link" state={{ fromHome: true }}>Home</Link>
           </li>
-          <li className={`nav-item ${isActive('/about')}`}>
-            <Link to="/about" className="nav-link">About</Link>
-          </li>
+          {/* About page hidden for now - will finish later */}
           <li className={`nav-item ${isActive('/portfolio')}`}>
             <Link 
               to="/portfolio" 
@@ -142,9 +140,7 @@ function Header() {
                 Home
               </Link>
             </li>
-            <li className={`mobile-nav-item ${isActive('/about')}`}>
-              <Link to="/about" className="mobile-nav-link" onClick={closeMobileMenu}>About Us</Link>
-            </li>
+            {/* About page hidden for now - will finish later */}
             <li className={`mobile-nav-item ${isActive('/portfolio')}`}>
               <Link 
                 to="/portfolio" 

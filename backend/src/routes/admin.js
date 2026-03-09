@@ -325,10 +325,18 @@ router.delete('/portfolio/:id/media/:mediaId', async (req, res) => {
       return res.status(404).json({ error: 'Portfolio item not found' });
     }
 
-    // Remove from images array
-    item.media.images = item.media.images.filter(img => img._id.toString() !== req.params.mediaId);
-    
-    // Save the updated item
+    const { mediaId } = req.params;
+
+    // Handle video and model3d (single-object media)
+    if (mediaId === 'video') {
+      item.media.video = undefined;
+    } else if (mediaId === 'model3d') {
+      item.media.model3d = undefined;
+    } else {
+      // Remove from images array by _id
+      item.media.images = item.media.images.filter(img => img._id.toString() !== mediaId);
+    }
+
     await item.save();
 
     res.json({ message: 'Media deleted successfully' });

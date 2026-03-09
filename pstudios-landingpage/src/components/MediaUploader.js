@@ -147,10 +147,13 @@ function MediaUploader({
           
           // Portfolio-specific: handle legacy response format
           if (type === 'portfolio' && !mediaItem && result.file) {
+            const mt = result.file.mimetype || '';
             mediaItem = {
               _id: result.file.id || undefined,
               src: result.file.url,
-              alt: file.name
+              alt: file.name,
+              mimetype: mt,
+              mediaType: mt.startsWith('video/') ? 'video' : (mt.includes('gltf') || (file.name || '').toLowerCase().endsWith('.glb') ? 'model3d' : 'image')
             };
           }
 
