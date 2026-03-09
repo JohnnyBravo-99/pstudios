@@ -80,14 +80,23 @@ const storage = multer.diskStorage({
 const fileFilter = (req, file, cb) => {
   const allowedTypes = [
     'image/jpeg',
+    'image/jpg',
     'image/png',
     'image/webp',
+    'image/gif',
     'video/mp4',
+    'video/x-mp4',
+    'video/quicktime',  // macOS often sends this for .mp4
     'model/gltf-binary',
+    'model/gltf+json',
     'application/octet-stream' // for .glb files
   ];
-  
-  if (allowedTypes.includes(file.mimetype)) {
+  const isVideoByExtension = (file.originalname || '').toLowerCase().endsWith('.mp4');
+  const isImageByExtension = /\.(jpe?g|png|webp|gif)$/i.test(file.originalname || '');
+  const isAllowed = allowedTypes.includes(file.mimetype) ||
+    (isVideoByExtension && file.mimetype?.startsWith('video/')) ||
+    (isImageByExtension && file.mimetype?.startsWith('image/'));
+  if (isAllowed) {
     cb(null, true);
   } else {
     cb(new Error('Invalid file type. Only images, videos, and 3D models are allowed.'), false);
@@ -282,7 +291,11 @@ router.post('/portfolio/:id/media', upload.single('media'), async (req, res) => 
     }
 
     const fileUrl = `/media/portfolio/${req.params.id}/${req.file.filename}`;
-    
+
+    // Ensure media.images array exists (schema default may not apply to older docs)
+    if (!item.media) item.media = {};
+    if (!Array.isArray(item.media.images)) item.media.images = [];
+
     // Determine file type and add to appropriate media field
     if (req.file.mimetype.startsWith('image/')) {
       item.media.images.push({

@@ -31,14 +31,17 @@ function MediaUploader({
 
   // Define allowed file types based on content type
   const getAllowedTypes = () => {
-    const baseTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    const baseTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     
     if (type === 'portfolio') {
       return [
         ...baseTypes,
         'image/gif',
         'video/mp4',
+        'video/x-mp4',
+        'video/quicktime', // macOS sends this for .mp4
         'model/gltf-binary',
+        'model/gltf+json',
         'application/octet-stream' // for .glb files
       ];
     } else if (type === 'blog') {
@@ -112,12 +115,17 @@ function MediaUploader({
 
     try {
       for (const file of filesToUpload) {
-        // Check file type
-        const isValidType = allowedTypes.includes(file.type) || 
-          (allowedExtensions && allowedExtensions.split(',').some(ext => 
-            file.name.toLowerCase().endsWith(ext.trim())
+        // Check file type (allow by extension for videos - browsers vary on mimetype)
+        const ext = (file.name || '').toLowerCase();
+        const isVideoByExt = ext.endsWith('.mp4') || ext.endsWith('.mov');
+        const isImageByExt = /\.(jpe?g|png|webp|gif)$/i.test(file.name || '');
+        const isValidType = allowedTypes.includes(file.type) ||
+          (isVideoByExt && (file.type?.startsWith('video/') || !file.type)) ||
+          (isImageByExt && (file.type?.startsWith('image/') || !file.type)) ||
+          (allowedExtensions && allowedExtensions.split(',').some(e =>
+            ext.endsWith(e.trim().toLowerCase())
           ));
-        
+
         if (!isValidType) {
           setError(`Invalid file type: ${file.name}. ${getSupportedTypesText()}`);
           continue;

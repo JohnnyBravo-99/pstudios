@@ -100,6 +100,7 @@ function AppContent() {
           <Route path="/admin/portfolio" element={<PortfolioList />} />
           <Route path="/admin/portfolio/new" element={<PortfolioForm />} />
           <Route path="/admin/portfolio/:id/edit" element={<PortfolioForm />} />
+          <Route path="/admin/portfolio/:id" element={<PortfolioForm />} />
           <Route path="/admin/blog" element={<BlogList />} />
           <Route path="/admin/blog/new" element={<BlogForm />} />
           <Route path="/admin/blog/:id/edit" element={<BlogForm />} />

@@ -30,8 +30,10 @@ const PORTFOLIO_TYPES = [
 ];
 
 function PortfolioForm() {
-  const { id } = useParams();
+  const { id: rawId } = useParams();
   const navigate = useNavigate();
+  // Treat "new" as create mode (e.g. from /admin/portfolio/new/edit)
+  const id = rawId === 'new' ? undefined : rawId;
   const isEdit = Boolean(id);
 
   const [formData, setFormData] = useState({
@@ -237,7 +239,7 @@ function PortfolioForm() {
             setSuccess('Project created successfully! You can now upload media files.');
             // Small delay to show success message before redirect
             setTimeout(() => {
-              navigate(`/admin/portfolio/${newItemId}`);
+              navigate(`/admin/portfolio/${newItemId}/edit`);
             }, 1500);
           } else {
             navigate('/admin/portfolio');
@@ -546,6 +548,11 @@ function PortfolioForm() {
 
       <div className="form-section">
         <h2>Media</h2>
+        {!id ? (
+          <p style={{ color: 'rgba(255,255,255,0.8)', marginTop: '0.5rem' }}>
+            Save the project first to upload media. You&apos;ll be redirected to the edit page after saving.
+          </p>
+        ) : (
         <MediaUploader
           itemId={id}
           type="portfolio"
@@ -557,9 +564,9 @@ function PortfolioForm() {
           }}
           onUploadComplete={() => {
             console.log('Media upload completed');
-            // Optional: Show success message or update UI
           }}
         />
+        )}
           
           {/* Display uploaded media */}
           {uploadedMedia.length > 0 && (
