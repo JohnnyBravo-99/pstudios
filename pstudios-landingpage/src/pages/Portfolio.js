@@ -4,14 +4,31 @@ import '../styles/Page.css';
 import API_BASE_URL from '../config/api';
 import { resolveMediaUrl } from '../utils/media';
 
+function isVideoSrc(src) {
+  return /\.(mp4|webm|mov)$/i.test(src || '');
+}
+
 function PortfolioDetail({ item }) {
   const { prefetchPortfolioItem, getPortfolioItem } = useDataCache();
   const [data, setData] = useState(item || {});
-  const images = data?.media?.images || [];
+
+  // Build unified media list: images + video
+  const buildMediaList = (d) => {
+    const list = [];
+    if (d?.media?.images) {
+      d.media.images.forEach(img => list.push({ ...img, kind: 'image' }));
+    }
+    if (d?.media?.video?.src) {
+      list.push({ src: d.media.video.src, alt: 'Video', kind: 'video', poster: d.media.video.poster });
+    }
+    return list;
+  };
+
+  const mediaItems = buildMediaList(data);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const hasImage = images.length > 0;
+  const hasMedia = mediaItems.length > 0;
 
   // Toggle fullscreen mode
   const toggleFullscreen = () => {
@@ -24,17 +41,17 @@ function PortfolioDetail({ item }) {
       if (isFullscreen) {
         if (e.key === 'Escape') {
           setIsFullscreen(false);
-        } else if (e.key === 'ArrowLeft' && images.length > 1) {
-          setActiveIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
-        } else if (e.key === 'ArrowRight' && images.length > 1) {
-          setActiveIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+        } else if (e.key === 'ArrowLeft' && mediaItems.length > 1) {
+          setActiveIndex((prev) => (prev > 0 ? prev - 1 : mediaItems.length - 1));
+        } else if (e.key === 'ArrowRight' && mediaItems.length > 1) {
+          setActiveIndex((prev) => (prev < mediaItems.length - 1 ? prev + 1 : 0));
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isFullscreen, images.length]);
+  }, [isFullscreen, mediaItems.length]);
 
   // Fetch full item by slug if list payload was minimal
   useEffect(() => {
@@ -108,26 +125,43 @@ function PortfolioDetail({ item }) {
       <section className="portfolio-media">
         <div 
           className="media-viewer" 
-          onClick={toggleFullscreen}
-          style={{ cursor: hasImage ? 'pointer' : 'default' }}
-          title={hasImage ? "Click to view fullscreen" : ""}
+          onClick={hasMedia && mediaItems[activeIndex].kind !== 'video' ? toggleFullscreen : undefined}
+          style={{ cursor: hasMedia && mediaItems[activeIndex].kind !== 'video' ? 'pointer' : 'default' }}
+          title={hasMedia && mediaItems[activeIndex].kind !== 'video' ? "Click to view fullscreen" : ""}
         >
-          {hasImage ? (
-            <img src={resolveMediaUrl(images[activeIndex].src)} alt={images[activeIndex].alt || data.title} />
+          {hasMedia ? (
+            mediaItems[activeIndex].kind === 'video' ? (
+              <video
+                key={mediaItems[activeIndex].src}
+                src={resolveMediaUrl(mediaItems[activeIndex].src)}
+                poster={mediaItems[activeIndex].poster ? resolveMediaUrl(mediaItems[activeIndex].poster) : undefined}
+                controls
+                playsInline
+                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+              />
+            ) : (
+              <img src={resolveMediaUrl(mediaItems[activeIndex].src)} alt={mediaItems[activeIndex].alt || data.title} />
+            )
           ) : (
             <div className="media-placeholder">No media available</div>
           )}
         </div>
-        {images.length > 1 && (
+        {mediaItems.length > 1 && (
           <div className="media-thumbs" role="listbox" aria-label="Media thumbnails">
-            {images.map((m, i) => (
+            {mediaItems.map((m, i) => (
               <button
                 key={m.src || i}
                 className={`thumb ${i === activeIndex ? 'active' : ''}`}
                 onClick={() => setActiveIndex(i)}
                 aria-selected={i === activeIndex}
               >
-                <img src={resolveMediaUrl(m.src)} alt={m.alt || `${data.title} ${i + 1}`} />
+                {m.kind === 'video' ? (
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#333', color: '#fff', fontSize: '0.7rem' }}>
+                    ▶ Video
+                  </div>
+                ) : (
+                  <img src={resolveMediaUrl(m.src)} alt={m.alt || `${data.title} ${i + 1}`} />
+                )}
               </button>
             ))}
           </div>
@@ -150,46 +184,61 @@ function PortfolioDetail({ item }) {
         </button>
         
         <div className="fullscreen-media" onClick={(e) => e.stopPropagation()}>
-          {hasImage && (
-            <img 
-              src={resolveMediaUrl(images[activeIndex].src)} 
-              alt={images[activeIndex].alt || data.title}
-              className="fullscreen-image"
-            />
+          {hasMedia && (
+            mediaItems[activeIndex].kind === 'video' ? (
+              <video
+                key={mediaItems[activeIndex].src}
+                src={resolveMediaUrl(mediaItems[activeIndex].src)}
+                controls
+                autoPlay
+                playsInline
+                className="fullscreen-image"
+              />
+            ) : (
+              <img 
+                src={resolveMediaUrl(mediaItems[activeIndex].src)} 
+                alt={mediaItems[activeIndex].alt || data.title}
+                className="fullscreen-image"
+              />
+            )
           )}
           
-          {images.length > 1 && (
+          {mediaItems.length > 1 && (
             <>
               <button 
                 className="fullscreen-nav fullscreen-prev"
-                onClick={() => setActiveIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1))}
-                aria-label="Previous image"
+                onClick={() => setActiveIndex((prev) => (prev > 0 ? prev - 1 : mediaItems.length - 1))}
+                aria-label="Previous media"
               >
                 ‹
               </button>
               <button 
                 className="fullscreen-nav fullscreen-next"
-                onClick={() => setActiveIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0))}
-                aria-label="Next image"
+                onClick={() => setActiveIndex((prev) => (prev < mediaItems.length - 1 ? prev + 1 : 0))}
+                aria-label="Next media"
               >
                 ›
               </button>
               
               <div className="fullscreen-thumbs">
-                {images.map((m, i) => (
+                {mediaItems.map((m, i) => (
                   <button
                     key={m.src || i}
                     className={`fullscreen-thumb ${i === activeIndex ? 'active' : ''}`}
                     onClick={() => setActiveIndex(i)}
                     aria-selected={i === activeIndex}
                   >
-                    <img src={resolveMediaUrl(m.src)} alt={m.alt || `${data.title} ${i + 1}`} />
+                    {m.kind === 'video' ? (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#333', color: '#fff', fontSize: '0.7rem' }}>▶</div>
+                    ) : (
+                      <img src={resolveMediaUrl(m.src)} alt={m.alt || `${data.title} ${i + 1}`} />
+                    )}
                   </button>
                 ))}
               </div>
               
               <div className="fullscreen-counter">
-                {activeIndex + 1} / {images.length}
+                {activeIndex + 1} / {mediaItems.length}
               </div>
             </>
           )}
@@ -347,6 +396,7 @@ function Portfolio() {
       <div className="portfolio-grid">
         {items.map((item) => {
           const firstImage = item?.media?.images?.[0];
+          const video = item?.media?.video;
           return (
             <div
               key={item._id}
@@ -360,13 +410,22 @@ function Portfolio() {
               }}
               aria-label={`Open ${item.title}`}
             >
-              {firstImage && (
+              {firstImage ? (
                 <img 
                   src={resolveMediaUrl(firstImage.src)} 
                   alt={firstImage.alt || item.title}
                   className="portfolio-card-image"
                 />
-              )}
+              ) : video?.src ? (
+                <video
+                  src={resolveMediaUrl(video.src)}
+                  className="portfolio-card-image"
+                  muted
+                  loop
+                  playsInline
+                  autoPlay
+                />
+              ) : null}
               <div className="portfolio-card-overlay">
                 <span className="portfolio-card-title">{item.title}</span>
               </div>
