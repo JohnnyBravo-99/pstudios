@@ -1,7 +1,10 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
 import API_BASE_URL from '../config/api';
 
 const DataCacheContext = createContext();
+
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const FETCH_TIMEOUT = 45000; // 45 seconds
 
 export const useDataCache = () => {
   const context = useContext(DataCacheContext);
@@ -18,26 +21,24 @@ export const DataCacheProvider = ({ children }) => {
       loading: false,
       error: null,
       lastFetched: null,
-      cacheTime: 5 * 60 * 1000, // 5 minutes
     },
-    portfolioItems: {}, // Individual items by slug
+    portfolioItems: {},
   });
 
-  // Prefetch portfolio list
+  // Deduplication refs — a single in-flight promise shared across all callers
+  const portfolioInflight = useRef(null);
+  const itemInflight = useRef({});
+
   const prefetchPortfolio = useCallback(async (force = false) => {
-    const portfolioCache = cache.portfolio;
-    
-    // Return cached data if still valid and not forcing refresh
-    if (!force && portfolioCache.data && portfolioCache.lastFetched) {
-      const age = Date.now() - portfolioCache.lastFetched;
-      if (age < portfolioCache.cacheTime) {
-        return portfolioCache.data;
-      }
+    // Return cached data if still valid
+    const { data, lastFetched } = cache.portfolio;
+    if (!force && data && lastFetched && Date.now() - lastFetched < CACHE_TTL) {
+      return data;
     }
 
-    // Don't fetch if already loading
-    if (portfolioCache.loading) {
-      return portfolioCache.data;
+    // If a request is already in-flight, piggyback on it instead of firing another
+    if (portfolioInflight.current) {
+      return portfolioInflight.current;
     }
 
     setCache(prev => ({
@@ -47,111 +48,110 @@ export const DataCacheProvider = ({ children }) => {
 
     const fetchUrl = `${API_BASE_URL}/api/portfolio`;
 
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
-      
-      const response = await fetch(fetchUrl, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        signal: controller.signal,
-        cache: 'default', // Allow browser caching
-      });
-      
-      clearTimeout(timeoutId);
-      
-      if (response.ok) {
-        const data = await response.json();
+    const promise = (async () => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+
+        const response = await fetch(fetchUrl, {
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          cache: 'default',
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const result = await response.json();
+          setCache(prev => ({
+            ...prev,
+            portfolio: { data: result, loading: false, error: null, lastFetched: Date.now() }
+          }));
+          return result;
+        }
+        throw new Error(`HTTP ${response.status}`);
+      } catch (err) {
+        const error = err.name === 'AbortError'
+          ? 'Request timed out'
+          : 'Failed to load portfolio';
+
         setCache(prev => ({
           ...prev,
-          portfolio: {
-            data,
-            loading: false,
-            error: null,
-            lastFetched: Date.now(),
-            cacheTime: prev.portfolio.cacheTime,
-          }
+          portfolio: { ...prev.portfolio, loading: false, error }
         }));
-        return data;
-      } else {
-        throw new Error(`HTTP ${response.status}`);
+        return null;
+      } finally {
+        portfolioInflight.current = null;
       }
-    } catch (err) {
-      const error = err.name === 'AbortError' 
-        ? 'Request timed out' 
-        : 'Failed to load portfolio';
-      
-      setCache(prev => ({
-        ...prev,
-        portfolio: {
-          ...prev.portfolio,
-          loading: false,
-          error,
-        }
-      }));
-      return null;
-    }
+    })();
+
+    portfolioInflight.current = promise;
+    return promise;
   }, [cache.portfolio]);
 
-  // Prefetch individual portfolio item
   const prefetchPortfolioItem = useCallback(async (slug) => {
     if (!slug) return null;
 
-    // Return cached if available
     if (cache.portfolioItems[slug]) {
       const cached = cache.portfolioItems[slug];
-      const age = Date.now() - cached.lastFetched;
-      if (age < 5 * 60 * 1000) { // 5 minute cache
+      if (Date.now() - cached.lastFetched < CACHE_TTL) {
         return cached.data;
       }
     }
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/portfolio/${slug}`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-        },
-        cache: 'default',
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setCache(prev => ({
-          ...prev,
-          portfolioItems: {
-            ...prev.portfolioItems,
-            [slug]: {
-              data,
-              lastFetched: Date.now(),
-            }
-          }
-        }));
-        return data;
-      }
-    } catch (err) {
-      console.error('Error prefetching portfolio item:', err);
+    // Deduplicate per-slug requests
+    if (itemInflight.current[slug]) {
+      return itemInflight.current[slug];
     }
-    return null;
+
+    const promise = (async () => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+
+        const response = await fetch(`${API_BASE_URL}/api/portfolio/${slug}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Accept': 'application/json' },
+          signal: controller.signal,
+          cache: 'default',
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const result = await response.json();
+          setCache(prev => ({
+            ...prev,
+            portfolioItems: {
+              ...prev.portfolioItems,
+              [slug]: { data: result, lastFetched: Date.now() }
+            }
+          }));
+          return result;
+        }
+      } catch (err) {
+        console.error('Error prefetching portfolio item:', err);
+      } finally {
+        delete itemInflight.current[slug];
+      }
+      return null;
+    })();
+
+    itemInflight.current[slug] = promise;
+    return promise;
   }, [cache.portfolioItems]);
 
-  // Get portfolio data (from cache or fetch)
   const getPortfolio = useCallback(async () => {
-    if (cache.portfolio.data && cache.portfolio.lastFetched) {
-      const age = Date.now() - cache.portfolio.lastFetched;
-      if (age < cache.portfolio.cacheTime) {
-        return cache.portfolio.data;
-      }
+    const { data, lastFetched } = cache.portfolio;
+    if (data && lastFetched && Date.now() - lastFetched < CACHE_TTL) {
+      return data;
     }
     return await prefetchPortfolio();
   }, [cache.portfolio, prefetchPortfolio]);
 
-  // Get individual item
   const getPortfolioItem = useCallback((slug) => {
     return cache.portfolioItems[slug]?.data || null;
   }, [cache.portfolioItems]);
@@ -163,7 +163,7 @@ export const DataCacheProvider = ({ children }) => {
     getPortfolio,
     getPortfolioItem,
     clearCache: () => setCache({
-      portfolio: { data: null, loading: false, error: null, lastFetched: null, cacheTime: 5 * 60 * 1000 },
+      portfolio: { data: null, loading: false, error: null, lastFetched: null },
       portfolioItems: {},
     }),
   };

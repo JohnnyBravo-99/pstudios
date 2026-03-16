@@ -1,12 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useDataCache } from '../context/DataCacheContext';
 import '../styles/Page.css';
-import API_BASE_URL from '../config/api';
 import { resolveMediaUrl } from '../utils/media';
-
-function isVideoSrc(src) {
-  return /\.(mp4|webm|mov)$/i.test(src || '');
-}
 
 function PortfolioDetail({ item }) {
   const { prefetchPortfolioItem, getPortfolioItem } = useDataCache();
@@ -300,12 +295,15 @@ function Portfolio() {
     setLoading(false);
   };
 
-  // Prefetch individual item on card hover
-  const handleCardHover = (item) => {
-    if (item?.slug) {
-      prefetchPortfolioItem(item.slug);
-    }
-  };
+  // Throttled hover-prefetch: at most one prefetch every 300ms to avoid flooding the API
+  const lastHoverPrefetch = useRef(0);
+  const handleCardHover = useCallback((item) => {
+    if (!item?.slug) return;
+    const now = Date.now();
+    if (now - lastHoverPrefetch.current < 300) return;
+    lastHoverPrefetch.current = now;
+    prefetchPortfolioItem(item.slug);
+  }, [prefetchPortfolioItem]);
 
   const loadDemoData = (showError = true) => {
     const demoItems = Array.from({ length: 9 }, (_, i) => ({
