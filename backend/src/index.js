@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 
 // Load environment variables based on NODE_ENV
+// Use absolute path to ensure .env file is found regardless of working directory
 const envFileName = process.env.NODE_ENV === 'development' 
   ? '.env.development' 
   : '.env';
@@ -20,8 +21,10 @@ const authRoutes = require('./routes/auth');
 const portfolioRoutes = require('./routes/portfolio');
 const blogRoutes = require('./routes/blog');
 const adminRoutes = require('./routes/admin');
+const contactRoutes = require('./routes/contact');
 
 const app = express();
+// Default to 3001 in development to avoid conflict with frontend on 3000
 const PORT = process.env.PORT || (process.env.NODE_ENV === 'development' ? 3001 : 3000);
 
 // Security middleware
@@ -29,26 +32,18 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
-// Health check BEFORE rate limiter so monitoring pings never count against the limit
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
-  });
-});
-
-// Rate limiting — 500 requests per 15-minute window per IP
+// Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 500,
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
   message: 'Too many requests from this IP, please try again later.'
 });
 app.use('/api/', limiter);
 
-// CORS configuration
+// CORS configuration - Enhanced for mobile compatibility
 app.use(cors({
   origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, Postman)
     if (!origin) {
       return callback(null, true);
     }
@@ -59,6 +54,7 @@ app.use(cors({
       'https://paradigmstudios.art',
       'https://johnnybravo-99.github.io',
       'https://johnnybravo-99.github.io/pstudios',
+      // Local development origins
       'http://localhost:3000',
       'http://localhost:3001',
       'http://localhost:3002',
@@ -80,9 +76,10 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'X-API-Key'],
   exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
 }));
 
+// Handle preflight requests explicitly for mobile browsers
 app.options('*', cors());
 
 // Body parsing middleware
@@ -112,6 +109,16 @@ app.use('/api/auth', authRoutes);
 app.use('/api/portfolio', portfolioRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/contact', contactRoutes);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -128,10 +135,14 @@ app.use('*', (req, res) => {
 });
 
 // Connect to MongoDB
+// Use different database URLs for dev vs production
 const getDatabaseUrl = () => {
+  // If DATABASE_URL is explicitly set, use it (but ensure correct port for dev)
   if (process.env.DATABASE_URL) {
     const url = process.env.DATABASE_URL;
+    // In development, ensure MongoDB port is 27017 (not 3000)
     if (process.env.NODE_ENV === 'development') {
+      // Replace any incorrect port with 27017 for MongoDB
       const correctedUrl = url.replace(/mongodb:\/\/[^:]+:\d+/, (match) => {
         if (match.includes(':3000')) {
           return match.replace(':3000', ':27017');
@@ -142,9 +153,11 @@ const getDatabaseUrl = () => {
     }
     return url;
   }
+  // Development default: use separate dev database on port 27017
   if (process.env.NODE_ENV === 'development') {
     return 'mongodb://localhost:27017/pstudios-dev';
   }
+  // Production default
   return 'mongodb://localhost:27017/pstudios';
 };
 
