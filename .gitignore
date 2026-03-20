@@ -155,6 +155,7 @@ dev/
 /dist/
 /static/
 /ghp_tmp/
+**/ghp_tmp/
 *.map
 asset-manifest.json
 

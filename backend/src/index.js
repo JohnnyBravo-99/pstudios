@@ -21,6 +21,7 @@ const authRoutes = require('./routes/auth');
 const portfolioRoutes = require('./routes/portfolio');
 const blogRoutes = require('./routes/blog');
 const adminRoutes = require('./routes/admin');
+const contactRoutes = require('./routes/contact');
 
 const app = express();
 // Default to 3001 in development to avoid conflict with frontend on 3000
@@ -108,6 +109,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/portfolio', portfolioRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

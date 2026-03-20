@@ -1,5 +1,13 @@
 const nodemailer = require('nodemailer');
 
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 // Create transporter based on environment configuration
 function createTransporter() {
   // For development, use a mock/console transporter if email is not configured
@@ -113,7 +121,62 @@ async function sendPasswordSetupEmail(email, setupToken) {
   }
 }
 
+/**
+ * Public contact intake — one-step submit from the marketing site.
+ * @param {{ name: string, email: string, subject: string, message: string }} payload
+ */
+async function sendContactIntakeEmail({ name, email, subject, message }) {
+  const to = process.env.CONTACT_INTAKE_TO || 'jarnold@paradigmstudios.art';
+  const subjectLine = `[Website intake] ${subject}`;
+  const text = [
+    'Contact intake — Paradigm Studios',
+    '',
+    `Name: ${name}`,
+    `Reply-to email: ${email}`,
+    '',
+    'Message:',
+    message,
+    '',
+    '— Sent via paradigmstudios.art contact form',
+  ].join('\n');
+
+  const safeName = escapeHtml(name);
+  const safeEmail = escapeHtml(email);
+  const safeSubject = escapeHtml(subject);
+  const safeMessage = escapeHtml(message).replace(/\r?\n/g, '<br/>');
+
+  const mailOptions = {
+    from: process.env.EMAIL_FROM || 'noreply@paradigmstudios.art',
+    to,
+    replyTo: email,
+    subject: subjectLine,
+    text,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #006699;">Website contact intake</h2>
+        <p><strong>Name:</strong> ${safeName}</p>
+        <p><strong>Reply-to:</strong> <a href="mailto:${encodeURIComponent(email)}">${safeEmail}</a></p>
+        <p><strong>Subject:</strong> ${safeSubject}</p>
+        <hr style="border: none; border-top: 1px solid #ddd;" />
+        <p style="white-space: normal;"><strong>Message:</strong></p>
+        <p style="white-space: normal;">${safeMessage}</p>
+        <p style="color: #999; font-size: 12px;">— Sent via paradigmstudios.art contact form</p>
+      </div>
+    `,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Contact intake email sent:', info.messageId);
+    return info;
+  } catch (error) {
+    console.error('Error sending contact intake email:', error);
+    throw error;
+  }
+}
+
 module.exports = {
   sendPasswordResetEmail,
-  sendPasswordSetupEmail
+  sendPasswordSetupEmail,
+  sendContactIntakeEmail,
 };
