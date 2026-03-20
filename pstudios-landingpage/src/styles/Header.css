@@ -15,6 +15,12 @@
   /*border-bottom: 1px solid rgba(51, 153, 204, 0.3);*/
 }
 
+/* Opacity is driven by JS (smoothed toward scroll target); avoid CSS transition fighting rAF */
+.nav-menu.desktop-nav.nav-menu--scroll-opacity {
+  transition: none;
+  will-change: opacity;
+}
+
 .nav-container {
   position: relative;
   width: 100%;

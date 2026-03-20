@@ -1,5 +1,20 @@
 # Replace 'api.example.com' with your actual domain
 # Example: api.yourdomain.com
+#
+# --- 502 + "CORS" in the browser ---
+# If https://www.yoursite.com sees "No Access-Control-Allow-Origin" but Network shows 502,
+# the API container (or Mongo) is usually down — Caddy's error page has no CORS headers.
+# Fix: docker compose ps / logs api on the VPS; see docs-archive/CONTENT_AND_API_SAFETY.md
+#
+# Optional (Caddy 2.6+): add CORS on proxy error responses so DevTools shows the real status:
+#   handle_errors {
+#       header Access-Control-Allow-Origin "https://www.paradigmstudios.art"
+#       header Access-Control-Allow-Credentials "true"
+#       header Vary "Origin"
+#       respond "{err.status_code} {err.status_text}"
+#   }
+# Place inside the site block, same level as handle / reverse_proxy (adjust origin to match site).
+
 api.example.com {
     # API endpoints
     handle /api/* {

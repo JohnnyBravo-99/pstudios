@@ -42,6 +42,11 @@ const blogPostSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  /** Overlay images (admin / Discord); Mixed so nested fields stay flexible */
+  positionedImages: {
+    type: [mongoose.Schema.Types.Mixed],
+    default: [],
+  },
   createdAt: {
     type: Date,
     default: Date.now

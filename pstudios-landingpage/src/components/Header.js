@@ -1,13 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useDataCache } from '../context/DataCacheContext';
 import verticalLogo from '../assets/logo-submark-marks-iconography/verticalStacked_01a.svg';
 import squareLogo from '../assets/logo-submark-marks-iconography/logo87x87mm.png';
 import '../styles/Header.css';
 
+/** Public pages where desktop nav links fade with scroll */
+const HEADER_SCROLL_HIDE_PATHS = new Set(['/', '/portfolio', '/contact']);
+
+/** Ease-in-out cubic on [0,1] — slows at ends so fade feels longer through the band */
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+}
+
 function Header() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  /** Smoothed opacity for desktop nav links (target is derived from scroll; this eases toward it) */
+  const [navLinksOpacity, setNavLinksOpacity] = useState(1);
+  const targetOpacityRef = useRef(1);
+  const smoothOpacityRef = useRef(1);
+  const animFrameRef = useRef(0);
+  const loopActiveRef = useRef(false);
   const [isSmallScreen, setIsSmallScreen] = useState(() => {
     // Initialize based on current window size
     if (typeof window !== 'undefined') {
@@ -75,6 +89,109 @@ function Header() {
     }
   };
 
+  /**
+   * Target opacity from scroll: long fade band (~35% of document height, min ~520px),
+   * ease-in-out along that band so the change is elongated, not a short ramp.
+   */
+  const updateTargetFromScroll = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const root = document.documentElement;
+    const y = window.scrollY;
+    const scrollHeight = root.scrollHeight;
+    const revealDepth = Math.max(scrollHeight * 0.38, 560);
+    let v = 1;
+    if (y <= 0) {
+      v = 1;
+    } else if (y >= revealDepth) {
+      v = 0;
+    } else {
+      const t = y / revealDepth;
+      v = 1 - easeInOutCubic(t);
+    }
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) {
+      v = y <= 0 ? 1 : y >= revealDepth ? 0 : 1 - y / revealDepth;
+    }
+    targetOpacityRef.current = v;
+  }, []);
+
+  const scrollHideActive =
+    HEADER_SCROLL_HIDE_PATHS.has(location.pathname) && !isMobileMenuOpen;
+
+  useEffect(() => {
+    if (!scrollHideActive) {
+      if (animFrameRef.current) {
+        cancelAnimationFrame(animFrameRef.current);
+        animFrameRef.current = 0;
+      }
+      loopActiveRef.current = false;
+      targetOpacityRef.current = 1;
+      smoothOpacityRef.current = 1;
+      setNavLinksOpacity(1);
+      return undefined;
+    }
+
+    /** Per frame: move displayed opacity toward target (elongated ease — not instant snap) */
+    const SMOOTH = 0.095;
+    const EPS = 0.002;
+
+    const runFrame = () => {
+      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+      const target = targetOpacityRef.current;
+      let smooth = smoothOpacityRef.current;
+
+      if (reduceMotion) {
+        smooth = target;
+      } else {
+        smooth += (target - smooth) * SMOOTH;
+        if (Math.abs(target - smooth) < EPS) smooth = target;
+      }
+      smoothOpacityRef.current = smooth;
+      setNavLinksOpacity(smooth);
+
+      const settled = Math.abs(target - smooth) < EPS;
+      if (!settled && !reduceMotion) {
+        animFrameRef.current = requestAnimationFrame(runFrame);
+      } else {
+        loopActiveRef.current = false;
+        animFrameRef.current = 0;
+      }
+    };
+
+    const onScrollOrResize = () => {
+      updateTargetFromScroll();
+      if (!loopActiveRef.current) {
+        loopActiveRef.current = true;
+        animFrameRef.current = requestAnimationFrame(runFrame);
+      }
+    };
+
+    updateTargetFromScroll();
+    smoothOpacityRef.current = targetOpacityRef.current;
+    setNavLinksOpacity(targetOpacityRef.current);
+    onScrollOrResize();
+
+    window.addEventListener('scroll', onScrollOrResize, { passive: true });
+    window.addEventListener('resize', onScrollOrResize, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', onScrollOrResize);
+      window.removeEventListener('resize', onScrollOrResize);
+      if (animFrameRef.current) {
+        cancelAnimationFrame(animFrameRef.current);
+        animFrameRef.current = 0;
+      }
+      loopActiveRef.current = false;
+    };
+  }, [scrollHideActive, location.pathname, updateTargetFromScroll]);
+
+  const navLinksStyle =
+    scrollHideActive && !isMobileMenuOpen
+      ? {
+          opacity: navLinksOpacity,
+          pointerEvents: navLinksOpacity < 0.05 ? 'none' : 'auto',
+        }
+      : undefined;
+
   return (
     <header className="main-header">
       <nav className="nav-container">
@@ -105,8 +222,11 @@ function Header() {
           <span className="hamburger-line"></span>
         </button>
         
-        {/* Desktop Navigation */}
-        <ul className="nav-menu desktop-nav">
+        {/* Desktop page links only — opacity eases with scroll (logo + hamburger stay visible) */}
+        <ul
+          className={`nav-menu desktop-nav${scrollHideActive ? ' nav-menu--scroll-opacity' : ''}`}
+          style={navLinksStyle}
+        >
           <li className={`nav-item ${isActive('/')}`}>
             <Link to="/" className="nav-link" state={{ fromHome: true }}>Home</Link>
           </li>

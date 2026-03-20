@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import logo from '../assets/logo-submark-marks-iconography/lp_logo.svg';
 import API_BASE_URL from '../config/api';
 import { resolveMediaUrl } from '../utils/media';
@@ -9,7 +8,6 @@ import '../styles/Page.css';
 const STORAGE_KEY = 'paradigmStudios_hasVisited';
 
 function Home() {
-  const location = useLocation();
   const [showLanding, setShowLanding] = useState(false);
   const [fadeOutLogo, setFadeOutLogo] = useState(false);
   const [blogPosts, setBlogPosts] = useState([]);
