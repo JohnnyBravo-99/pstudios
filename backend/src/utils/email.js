@@ -17,7 +17,7 @@ function normalizeSmtpPassword(raw) {
   if (!p) return '';
   if (process.env.NODE_ENV === 'production' && SMTP_PASSWORD_PLACEHOLDERS.has(p.toLowerCase())) {
     console.warn(
-      '[email] SMTP_PASSWORD is still a placeholder. Set the real Hostinger mailbox password in env (e.g. envs/api.env) and recreate the API container.'
+      '[email] SMTP_PASSWORD is still a placeholder. Set the real mailbox password (or Microsoft 365 app password) in env (e.g. envs/api.env) and recreate the API container.'
     );
     return '';
   }

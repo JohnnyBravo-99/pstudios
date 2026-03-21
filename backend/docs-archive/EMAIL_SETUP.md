@@ -16,8 +16,8 @@ That response is **HTTP 503** when `sendMail` fails **or** when **no email trans
 
 | What you see | Cause |
 |----------------|--------|
-| `Invalid login: 535 Authentication failed` | The SMTP **mailbox password** is wrong, or **SMTP_USER** is not the full email address Hostinger expects. |
-| `SMTP_PASSWORD` length never changed (e.g. still 9 characters) | The value is still the literal placeholder **`REPLACEME`** — replace it in **`envs/api.env`** (or whatever your Compose `env_file` uses) with the real password from **Hostinger → Email → manage mailbox**. |
+| `Invalid login: 535 Authentication failed` | Wrong **SMTP password**, **SMTP_USER** is not the full Microsoft 365 sign-in address, or **[SMTP AUTH is disabled](#microsoft-365--godaddy-email-essentials)** for that mailbox. |
+| `SMTP_PASSWORD` still a placeholder | Replace **`REPLACEME`** in **`envs/api.env`** with the real mailbox password (or an **app password** if MFA is on). |
 | `EMAIL_TRANSPORT_NOT_CONFIGURED` | No Gmail/SMTP env, or SMTP password is empty / treated as a placeholder in production. |
 
 After changing the password, **recreate** the API container so the new env is loaded: `docker compose up -d --force-recreate api`.
@@ -61,7 +61,7 @@ EMAIL_PASSWORD=your_16_char_app_password
 
 - **`EMAIL_FROM`:** Must be an address Gmail is allowed to send as (often same as `EMAIL_USER`, or a verified alias).
 
-### Option B — SMTP (Hostinger, SendGrid, Mailgun, your domain, etc.)
+### Option B — Generic SMTP (SendGrid, Mailgun, ISP, etc.)
 
 ```env
 NODE_ENV=production
@@ -75,6 +75,37 @@ SMTP_PASSWORD=your_smtp_password
 ```
 
 Do **not** set `EMAIL_SERVICE=gmail` if you use pure SMTP unless you also supply Gmail fields.
+
+### Microsoft 365 / GoDaddy Email Essentials
+
+If the mailbox is **Microsoft 365 Email Essentials** (sold through GoDaddy), outbound SMTP uses **Microsoft’s** servers, not your VPS host’s email.
+
+**Typical settings (confirm in [GoDaddy’s Microsoft 365 server settings](https://www.godaddy.com/help/find-my-microsoft-365-server-settings-9012)):**
+
+| Variable | Value |
+|----------|--------|
+| `SMTP_HOST` | `smtp.office365.com` |
+| `SMTP_PORT` | `587` |
+| `SMTP_SECURE` | `false` (STARTTLS on 587 — our Nodemailer config sets `requireTLS` for 587) |
+| `SMTP_USER` | Full email address (e.g. `you@paradigmstudios.art`) |
+| `SMTP_PASSWORD` | That mailbox’s password, or a **Microsoft 365 app password** if the account uses MFA |
+| `EMAIL_FROM` | Usually the **same** address as `SMTP_USER` (Microsoft often requires “send as” to match the authenticated mailbox) |
+
+**Enable SMTP authentication:** For many tenants, SMTP AUTH must be turned on for the mailbox (admin) — see GoDaddy: [Enable SMTP authentication](https://www.godaddy.com/help/enable-smtp-authentication-40981).
+
+**Principle:** `CONTACT_INTAKE_TO` can still be `jarnold@…` for **delivery**; `SMTP_USER` / `EMAIL_FROM` must be a mailbox that is allowed to **authenticate** to `smtp.office365.com` (often your primary sending address).
+
+Example `envs/api.env` fragment:
+
+```env
+CONTACT_INTAKE_TO=jarnold@paradigmstudios.art
+EMAIL_FROM=jarnold@paradigmstudios.art
+SMTP_HOST=smtp.office365.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=jarnold@paradigmstudios.art
+SMTP_PASSWORD=your_microsoft365_password_or_app_password
+```
 
 ## Code reference
 

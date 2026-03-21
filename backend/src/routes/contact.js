@@ -42,7 +42,7 @@ router.post('/intake', intakeLimiter, async (req, res) => {
     console.error('Contact intake route error:', err);
     if (err.code === 'EAUTH') {
       console.error(
-        '[contact/intake] SMTP authentication failed (535). Check SMTP_USER / SMTP_PASSWORD (Hostinger mailbox password) and that EMAIL_FROM matches the mailbox. See docs-archive/EMAIL_SETUP.md'
+        '[contact/intake] SMTP authentication failed (535). Check SMTP_USER / SMTP_PASSWORD, EMAIL_FROM vs mailbox, SMTP AUTH enabled (Microsoft 365), and docs-archive/EMAIL_SETUP.md'
       );
     }
     if (err.code === 'EMAIL_TRANSPORT_NOT_CONFIGURED') {
