@@ -5,14 +5,33 @@ const nodemailer = require('nodemailer');
  * SMTP password from env or from a file path (Docker secret / chmod 600 file on VPS).
  * Principle: avoid storing the mailbox password in plain `api.env` when you prefer a mounted secret.
  */
+/** Values that must never be used as real SMTP passwords in production (ops placeholders). */
+const SMTP_PASSWORD_PLACEHOLDERS = new Set(
+  ['REPLACEME', 'CHANGE_ME', 'YOUR_PASSWORD', 'PASSWORD', 'PASTE_HOSTINGER_MAILBOX_PASSWORD_HERE'].map((s) =>
+    s.toLowerCase()
+  )
+);
+
+function normalizeSmtpPassword(raw) {
+  const p = String(raw || '').trim();
+  if (!p) return '';
+  if (process.env.NODE_ENV === 'production' && SMTP_PASSWORD_PLACEHOLDERS.has(p.toLowerCase())) {
+    console.warn(
+      '[email] SMTP_PASSWORD is still a placeholder. Set the real Hostinger mailbox password in env (e.g. envs/api.env) and recreate the API container.'
+    );
+    return '';
+  }
+  return p;
+}
+
 function getSmtpPassword() {
   if (process.env.SMTP_PASSWORD && String(process.env.SMTP_PASSWORD).trim() !== '') {
-    return String(process.env.SMTP_PASSWORD).trim();
+    return normalizeSmtpPassword(process.env.SMTP_PASSWORD);
   }
   const filePath = process.env.SMTP_PASSWORD_FILE;
   if (!filePath) return '';
   try {
-    return fs.readFileSync(filePath, 'utf8').trim();
+    return normalizeSmtpPassword(fs.readFileSync(filePath, 'utf8'));
   } catch (e) {
     console.error('SMTP_PASSWORD_FILE read failed:', filePath, e.message);
     return '';
@@ -63,15 +82,25 @@ function resolveTransporter() {
   }
 
   if (hasSmtp) {
-    return nodemailer.createTransport({
+    const port = parseInt(process.env.SMTP_PORT || '587', 10);
+    const secure = process.env.SMTP_SECURE === 'true';
+    const transport = {
       host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '587', 10),
-      secure: process.env.SMTP_SECURE === 'true',
+      port,
+      secure,
       auth: {
-        user: process.env.SMTP_USER,
+        user: String(process.env.SMTP_USER || '').trim(),
         pass: smtpPass,
       },
-    });
+    };
+    // Port 587: STARTTLS (secure: false). Port 465: implicit TLS (secure: true).
+    if (!secure && port === 587) {
+      transport.requireTLS = true;
+    }
+    if (process.env.SMTP_TLS_REJECT_UNAUTHORIZED === 'false') {
+      transport.tls = { ...(transport.tls || {}), rejectUnauthorized: false };
+    }
+    return nodemailer.createTransport(transport);
   }
 
   // Local dev without credentials: log only (no real send)

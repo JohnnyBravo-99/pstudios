@@ -12,6 +12,16 @@ That response is **HTTP 503** when `sendMail` fails **or** when **no email trans
 
 **Principle:** Nodemailer must have a **real SMTP (or Gmail) account** in environment variables. The inbox address (`CONTACT_INTAKE_TO`) is only **who receives** the message; it does **not** authenticate sending.
 
+### Troubleshooting: 503 + logs show `535` / `EAUTH`
+
+| What you see | Cause |
+|----------------|--------|
+| `Invalid login: 535 Authentication failed` | The SMTP **mailbox password** is wrong, or **SMTP_USER** is not the full email address Hostinger expects. |
+| `SMTP_PASSWORD` length never changed (e.g. still 9 characters) | The value is still the literal placeholder **`REPLACEME`** — replace it in **`envs/api.env`** (or whatever your Compose `env_file` uses) with the real password from **Hostinger → Email → manage mailbox**. |
+| `EMAIL_TRANSPORT_NOT_CONFIGURED` | No Gmail/SMTP env, or SMTP password is empty / treated as a placeholder in production. |
+
+After changing the password, **recreate** the API container so the new env is loaded: `docker compose up -d --force-recreate api`.
+
 ## Where to configure (VPS / Docker)
 
 1. **File used by Compose:** check `docker-compose.yml` → `env_file`. Some deployments use `backend/.env`, others `backend/envs/api.env` — they are equivalent for Nodemailer; use whichever your Compose file references.

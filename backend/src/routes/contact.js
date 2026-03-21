@@ -40,6 +40,14 @@ router.post('/intake', intakeLimiter, async (req, res) => {
     return res.status(200).json({ ok: true, message: 'Your message was sent.' });
   } catch (err) {
     console.error('Contact intake route error:', err);
+    if (err.code === 'EAUTH') {
+      console.error(
+        '[contact/intake] SMTP authentication failed (535). Check SMTP_USER / SMTP_PASSWORD (Hostinger mailbox password) and that EMAIL_FROM matches the mailbox. See docs-archive/EMAIL_SETUP.md'
+      );
+    }
+    if (err.code === 'EMAIL_TRANSPORT_NOT_CONFIGURED') {
+      console.error('[contact/intake] No email transport (missing Gmail/SMTP or SMTP_PASSWORD still a placeholder).');
+    }
     if (process.env.NODE_ENV === 'development' && err.code === 'EMAIL_TRANSPORT_NOT_CONFIGURED') {
       return res.status(503).json({
         error:
