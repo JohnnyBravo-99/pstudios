@@ -17,3 +17,5 @@ When backend or Docker config changes should go to production **or** the user as
    - Verify: `vps_docker_logs` on `mern_api`, or `curl` `https://api.paradigmstudios.art/api/health`.
 
 3. **Principle:** The user should not be routed to “go do this on the server” when the MCP tools can perform the same operations.
+
+4. **Markdown / docs vs VPS:** The API **Docker image** does not include `*.md` or `docs-archive/` (see `backend/Dockerfile` — only `src/` + `package.json`; `backend/.dockerignore` shrinks build context). A full `git pull` on the VPS still checks out those files on **disk**; that is optional. To omit docs from the server working tree, use Git **[sparse-checkout](https://git-scm.com/docs/git-sparse-checkout)** (e.g. exclude `**/docs-archive`, `**/*.md`) or deploy only runtime paths—docs remain in the GitHub repo for local/Cursor use.
