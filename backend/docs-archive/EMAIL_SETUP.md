@@ -102,11 +102,27 @@ If API logs show **`535 5.7.139`** and **`SmtpClientAuthentication is disabled f
 
 **What to do (someone with Microsoft 365 admin access):**
 
-1. Read Microsoft’s guide: **[https://aka.ms/smtp_auth_disabled](https://aka.ms/smtp_auth_disabled)**  
-2. **Per mailbox (common fix):** In [Exchange admin center](https://admin.exchange.microsoft.com) → **Recipients** → **Mailboxes** → select the user → **Email apps** (or **Manage email apps settings**) → enable **Authenticated SMTP** (wording varies by UI).  
-3. **PowerShell (Exchange Online):**  
+The error text says **“for the Tenant”** — that usually means the **organization-wide (transport)** setting is still turning SMTP AUTH **off**, or the change has not propagated. **Only enabling “Authenticated SMTP” on one mailbox** is **not** always enough if the **tenant** still blocks SMTP.
+
+1. Read Microsoft’s guide: **[https://aka.ms/smtp_auth_disabled](https://aka.ms/smtp_auth_disabled)** and **[Enable or disable SMTP AUTH in Exchange Online](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/authenticated-client-smtp-submission)**.
+
+2. **Organization-wide (do this first if 535.7.139 persists):** In [Exchange admin center](https://admin.exchange.microsoft.com) → **Settings** → **[Settings](https://admin.exchange.microsoft.com/#/settings)** → **Mail flow** (or the page that lists **SMTP AUTH**). Find **“Turn off SMTP AUTH protocol for your organization”** and make sure you are **not** globally turning SMTP off (per [Microsoft Learn](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/authenticated-client-smtp-submission), that toggle controls the whole tenant).  
+   **PowerShell (Exchange Online):**  
+   `Get-TransportConfig | Format-List SmtpClientAuthenticationDisabled`  
+   If this is **`True`**, SMTP AUTH is **disabled for the whole organization**. To allow it:  
+   `Set-TransportConfig -SmtpClientAuthenticationDisabled $false`  
+   Then re-check: `Get-TransportConfig | Format-List SmtpClientAuthenticationDisabled` → should be **`False`**.
+
+3. **Per mailbox:** [Microsoft 365 admin center](https://admin.microsoft.com/) → **Users** → **Active users** → user → **Mail** → **Manage email apps** → **Authenticated SMTP** = **on**.  
+   Or **PowerShell:**  
    `Set-CASMailbox -Identity user@yourdomain.com -SmtpClientAuthenticationDisabled $false`  
-4. **GoDaddy-bought Microsoft 365:** Use the **Microsoft 365 admin** / **Email & Office** dashboard — same requirement: **SMTP authenticated submission** must be allowed for that mailbox.
+   Verify: `Get-CASMailbox -Identity user@yourdomain.com | Format-List SmtpClientAuthenticationDisabled` → **`False`** means SMTP is **enabled** for that mailbox (naming is inverted).
+
+4. **Wait** 15–60+ minutes after changes; Microsoft often propagates slowly.
+
+5. If it **still** fails: an **authentication policy** or **Security defaults** in **Microsoft Entra ID** may block **basic authentication** for SMTP even when the above are “on”. See [Disable Basic authentication in Exchange Online](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/disable-basic-authentication-in-exchange-online) and your org’s **Conditional Access** / **Authentication methods** policies. In that case, use **OAuth** for SMTP (advanced) or a **transactional email provider** (SendGrid, Mailgun, Resend, SES) instead of `smtp.office365.com`.
+
+6. **GoDaddy-bought Microsoft 365:** Same controls, but you may need to open **Email & Office** / **Microsoft 365 admin** from GoDaddy to reach the same settings.
 
 If your org **cannot** enable SMTP AUTH (security policy), use a **transactional provider** instead (SendGrid, Mailgun, Resend, Amazon SES) with their SMTP or HTTP API — not `smtp.office365.com`.
 
