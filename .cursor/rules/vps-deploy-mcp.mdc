@@ -1,0 +1,19 @@
+---
+description: Deploy backend to Paradigm VPS via MCP (no manual SSH instructions)
+alwaysApply: true
+---
+
+# Paradigm VPS deploy (MCP)
+
+When backend or Docker config changes should go to production **or** the user asks to update the VPS:
+
+1. **Use the Cursor MCP server** `user-paradigm-studios-mcp` (Paradigm Studios MCP). Do **not** tell the user to SSH into the backend unless MCP is unavailable or they explicitly prefer manual steps.
+
+2. **Typical flow** (paths on VPS: repo `/home/jay_gatsby/mernvps`, backend `/home/jay_gatsby/mernvps/backend`):
+   - `vps_git_pull` with `path: /home/jay_gatsby/mernvps`, `branch: main`.
+   - If pull fails (divergent branches): `vps_execute` — e.g. `git fetch origin main && git checkout -f main && git reset --hard origin/main` after resolving untracked conflicts (preserve `backend/uploads/` user media).
+   - **Env file:** `docker-compose.yml` uses `env_file: ./envs/api.env`. If `envs/api.env` is missing, `mkdir -p backend/envs && cp backend/.env backend/envs/api.env` (keep existing secrets).
+   - Rebuild API: `vps_execute` `cd /home/jay_gatsby/mernvps/backend && docker compose up -d --build --force-recreate api` (timeout several minutes for image build).
+   - Verify: `vps_docker_logs` on `mern_api`, or `curl` `https://api.paradigmstudios.art/api/health`.
+
+3. **Principle:** The user should not be routed to “go do this on the server” when the MCP tools can perform the same operations.
