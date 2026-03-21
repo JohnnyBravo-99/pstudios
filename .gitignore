@@ -122,8 +122,9 @@ temp/
 ehthumbs.db
 Thumbs.db
 
-# Docker
+# Docker (allow backend/.dockerignore — defines API image build context exclusions)
 .dockerignore
+!backend/.dockerignore
 
 # Backup files
 backups/

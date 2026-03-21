@@ -1,0 +1,11 @@
+# Reduce Docker build context; runtime image only COPYs package*.json + src/ (see Dockerfile).
+# Principle: documentation and examples stay in the repo for local development, not in the image.
+
+docs-archive/
+**/*.md
+*.md
+README*
+.env.example
+env.example
+.gitignore
+configs/
