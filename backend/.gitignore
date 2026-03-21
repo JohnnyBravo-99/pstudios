@@ -1,0 +1,4 @@
+# Local / VPS-only mailbox password (optional when using SMTP_PASSWORD_FILE)
+secrets/*
+!secrets/.gitkeep
+!secrets/README.md

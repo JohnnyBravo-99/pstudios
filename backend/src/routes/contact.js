@@ -40,6 +40,12 @@ router.post('/intake', intakeLimiter, async (req, res) => {
     return res.status(200).json({ ok: true, message: 'Your message was sent.' });
   } catch (err) {
     console.error('Contact intake route error:', err);
+    if (process.env.NODE_ENV === 'development' && err.code === 'EMAIL_TRANSPORT_NOT_CONFIGURED') {
+      return res.status(503).json({
+        error:
+          'Email is not configured on this server. Set Gmail or SMTP in env (see backend/docs-archive/EMAIL_SETUP.md).',
+      });
+    }
     return res.status(503).json({
       error: 'Unable to send your message right now. Please try again later or reach us by phone or social media.',
     });

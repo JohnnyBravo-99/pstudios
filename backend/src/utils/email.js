@@ -1,4 +1,23 @@
+const fs = require('fs');
 const nodemailer = require('nodemailer');
+
+/**
+ * SMTP password from env or from a file path (Docker secret / chmod 600 file on VPS).
+ * Principle: avoid storing the mailbox password in plain `api.env` when you prefer a mounted secret.
+ */
+function getSmtpPassword() {
+  if (process.env.SMTP_PASSWORD && String(process.env.SMTP_PASSWORD).trim() !== '') {
+    return String(process.env.SMTP_PASSWORD).trim();
+  }
+  const filePath = process.env.SMTP_PASSWORD_FILE;
+  if (!filePath) return '';
+  try {
+    return fs.readFileSync(filePath, 'utf8').trim();
+  } catch (e) {
+    console.error('SMTP_PASSWORD_FILE read failed:', filePath, e.message);
+    return '';
+  }
+}
 
 function escapeHtml(str) {
   return String(str)
@@ -8,46 +27,77 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-// Create transporter based on environment configuration
-function createTransporter() {
-  // For development, use a mock/console transporter if email is not configured
-  if (process.env.NODE_ENV === 'development' && !process.env.EMAIL_USER) {
-    return {
-      sendMail: async (options) => {
-        console.log('📧 [DEV MODE] Email would be sent:');
-        console.log('  To:', options.to);
-        console.log('  Subject:', options.subject);
-        console.log('  Text:', options.text);
-        console.log('  HTML:', options.html);
-        return { messageId: 'dev-mock-' + Date.now() };
-      }
-    };
-  }
+/** Dev-only mock when no real transport is configured */
+const mockTransporter = {
+  sendMail: async (options) => {
+    console.log('📧 [DEV MODE] Email would be sent:');
+    console.log('  To:', options.to);
+    console.log('  Subject:', options.subject);
+    console.log('  Text:', options.text);
+    return { messageId: 'dev-mock-' + Date.now() };
+  },
+};
 
-  // Production email configuration
-  if (process.env.EMAIL_SERVICE === 'gmail') {
+/**
+ * Resolve Nodemailer transport. Production requires Gmail **or** SMTP env vars
+ * (see backend/docs-archive/EMAIL_SETUP.md).
+ */
+function resolveTransporter() {
+  const hasGmail =
+    process.env.EMAIL_SERVICE === 'gmail' &&
+    process.env.EMAIL_USER &&
+    process.env.EMAIL_PASSWORD;
+
+  const smtpPass = getSmtpPassword();
+  const hasSmtp =
+    process.env.SMTP_HOST && process.env.SMTP_USER && smtpPass.length > 0;
+
+  if (hasGmail) {
     return nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
-      }
+        pass: process.env.EMAIL_PASSWORD,
+      },
     });
   }
 
-  // Custom SMTP configuration
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASSWORD
-    }
-  });
+  if (hasSmtp) {
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '587', 10),
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: smtpPass,
+      },
+    });
+  }
+
+  // Local dev without credentials: log only (no real send)
+  if (process.env.NODE_ENV === 'development') {
+    return mockTransporter;
+  }
+
+  return null;
 }
 
-const transporter = createTransporter();
+function getTransporterOrThrow() {
+  const t = resolveTransporter();
+  if (!t) {
+    const err = new Error(
+      'EMAIL_TRANSPORT_NOT_CONFIGURED: Set Gmail (EMAIL_SERVICE=gmail, EMAIL_USER, EMAIL_PASSWORD) or SMTP (SMTP_HOST, SMTP_USER, SMTP_PASSWORD or SMTP_PASSWORD_FILE) in env — see backend/docs-archive/EMAIL_SETUP.md'
+    );
+    err.code = 'EMAIL_TRANSPORT_NOT_CONFIGURED';
+    throw err;
+  }
+  return t;
+}
+
+/** True when Nodemailer can send (Gmail/SMTP or dev mock). */
+function isEmailOutboundConfigured() {
+  return resolveTransporter() !== null;
+}
 
 /**
  * Send password reset email
@@ -76,7 +126,7 @@ async function sendPasswordResetEmail(email, resetToken) {
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
+    const info = await getTransporterOrThrow().sendMail(mailOptions);
     console.log('Password reset email sent:', info.messageId);
     return info;
   } catch (error) {
@@ -112,7 +162,7 @@ async function sendPasswordSetupEmail(email, setupToken) {
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
+    const info = await getTransporterOrThrow().sendMail(mailOptions);
     console.log('Password setup email sent:', info.messageId);
     return info;
   } catch (error) {
@@ -155,7 +205,7 @@ async function sendContactIntakeEmail({ name, email, subject, message }) {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #006699;">Website contact intake</h2>
         <p><strong>Name:</strong> ${safeName}</p>
-        <p><strong>Reply-to:</strong> <a href="mailto:${encodeURIComponent(email)}">${safeEmail}</a></p>
+        <p><strong>Reply-to:</strong> <a href="mailto:${String(email).replace(/"/g, '')}">${safeEmail}</a></p>
         <p><strong>Subject:</strong> ${safeSubject}</p>
         <hr style="border: none; border-top: 1px solid #ddd;" />
         <p style="white-space: normal;"><strong>Message:</strong></p>
@@ -166,7 +216,7 @@ async function sendContactIntakeEmail({ name, email, subject, message }) {
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
+    const info = await getTransporterOrThrow().sendMail(mailOptions);
     console.log('Contact intake email sent:', info.messageId);
     return info;
   } catch (error) {
@@ -179,4 +229,5 @@ module.exports = {
   sendPasswordResetEmail,
   sendPasswordSetupEmail,
   sendContactIntakeEmail,
+  isEmailOutboundConfigured,
 };

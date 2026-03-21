@@ -15,6 +15,8 @@ services:
     volumes:
       - ./logs/api:/usr/src/app/logs
       - ./uploads:/usr/src/app/uploads
+      # Mailbox password file (optional): set SMTP_PASSWORD_FILE=/usr/src/app/secrets/smtp_password.txt in envs/api.env
+      - ./secrets:/usr/src/app/secrets:ro
 
   mongo:
     image: mongo:6.0

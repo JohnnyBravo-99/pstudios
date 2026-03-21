@@ -22,6 +22,7 @@ const portfolioRoutes = require('./routes/portfolio');
 const blogRoutes = require('./routes/blog');
 const adminRoutes = require('./routes/admin');
 const contactRoutes = require('./routes/contact');
+const { isEmailOutboundConfigured } = require('./utils/email');
 
 const app = express();
 // Default to 3001 in development to avoid conflict with frontend on 3000
@@ -111,12 +112,13 @@ app.use('/api/blog', blogRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/contact', contactRoutes);
 
-// Health check endpoint
+// Health check endpoint (emailOutboundConfigured: false until SMTP/Gmail is set — see docs-archive/EMAIL_SETUP.md)
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    emailOutboundConfigured: isEmailOutboundConfigured(),
   });
 });
 
