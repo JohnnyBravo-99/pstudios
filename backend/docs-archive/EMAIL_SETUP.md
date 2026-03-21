@@ -16,7 +16,8 @@ That response is **HTTP 503** when `sendMail` fails **or** when **no email trans
 
 | What you see | Cause |
 |----------------|--------|
-| `Invalid login: 535 Authentication failed` | Wrong **SMTP password**, **SMTP_USER** is not the full Microsoft 365 sign-in address, or **[SMTP AUTH is disabled](#microsoft-365--godaddy-email-essentials)** for that mailbox. |
+| `Invalid login: 535 Authentication failed` | Wrong **SMTP password** or **SMTP_USER** is not the full Microsoft 365 sign-in address. |
+| **`535 5.7.139` / `SmtpClientAuthentication is disabled for the Tenant`** | Microsoft has **turned off SMTP AUTH** for your organization (or this mailbox). **Not a bad password** — see [SMTP AUTH disabled](#error-smtp-auth-disabled-for-the-tenant-microsoft-365). |
 | `SMTP_PASSWORD` still a placeholder | Replace **`REPLACEME`** in **`envs/api.env`** with the real mailbox password (or an **app password** if MFA is on). |
 | `EMAIL_TRANSPORT_NOT_CONFIGURED` | No Gmail/SMTP env, or SMTP password is empty / treated as a placeholder in production. |
 
@@ -93,7 +94,23 @@ If the mailbox is **Microsoft 365 Email Essentials** (sold through GoDaddy), out
 
 **Enable SMTP authentication:** For many tenants, SMTP AUTH must be turned on for the mailbox (admin) — see GoDaddy: [Enable SMTP authentication](https://www.godaddy.com/help/enable-smtp-authentication-40981).
 
-**Principle:** `CONTACT_INTAKE_TO` can still be `jarnold@…` for **delivery**; `SMTP_USER` / `EMAIL_FROM` must be a mailbox that is allowed to **authenticate** to `smtp.office365.com` (often your primary sending address).
+### Error: “SMTP AUTH disabled for the Tenant” (Microsoft 365)
+
+If API logs show **`535 5.7.139`** and **`SmtpClientAuthentication is disabled for the Tenant`**, your **password is fine** — Microsoft is **blocking SMTP client login** for the whole tenant (or this mailbox).
+
+**Principle:** Microsoft 365 can disable **authenticated SMTP submission** (`smtp.office365.com`) by policy. Nodemailer uses that; until SMTP AUTH is allowed, every send will fail with **503**.
+
+**What to do (someone with Microsoft 365 admin access):**
+
+1. Read Microsoft’s guide: **[https://aka.ms/smtp_auth_disabled](https://aka.ms/smtp_auth_disabled)**  
+2. **Per mailbox (common fix):** In [Exchange admin center](https://admin.exchange.microsoft.com) → **Recipients** → **Mailboxes** → select the user → **Email apps** (or **Manage email apps settings**) → enable **Authenticated SMTP** (wording varies by UI).  
+3. **PowerShell (Exchange Online):**  
+   `Set-CASMailbox -Identity user@yourdomain.com -SmtpClientAuthenticationDisabled $false`  
+4. **GoDaddy-bought Microsoft 365:** Use the **Microsoft 365 admin** / **Email & Office** dashboard — same requirement: **SMTP authenticated submission** must be allowed for that mailbox.
+
+If your org **cannot** enable SMTP AUTH (security policy), use a **transactional provider** instead (SendGrid, Mailgun, Resend, Amazon SES) with their SMTP or HTTP API — not `smtp.office365.com`.
+
+`CONTACT_INTAKE_TO` can still be `jarnold@…` for **delivery**; `SMTP_USER` / `EMAIL_FROM` must be a mailbox allowed to **authenticate** to `smtp.office365.com`.
 
 Example `envs/api.env` fragment:
 

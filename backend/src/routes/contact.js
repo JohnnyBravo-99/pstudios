@@ -41,9 +41,16 @@ router.post('/intake', intakeLimiter, async (req, res) => {
   } catch (err) {
     console.error('Contact intake route error:', err);
     if (err.code === 'EAUTH') {
-      console.error(
-        '[contact/intake] SMTP authentication failed (535). Check SMTP_USER / SMTP_PASSWORD, EMAIL_FROM vs mailbox, SMTP AUTH enabled (Microsoft 365), and docs-archive/EMAIL_SETUP.md'
-      );
+      const resp = String(err.response || err.message || '');
+      if (resp.includes('SmtpClientAuthentication') || resp.includes('smtp_auth_disabled')) {
+        console.error(
+          '[contact/intake] Microsoft 365: SMTP AUTH is disabled for this tenant/mailbox (535.7.139). Password may be correct. Enable Authenticated SMTP in Microsoft 365 admin: https://aka.ms/smtp_auth_disabled — see backend/docs-archive/EMAIL_SETUP.md'
+        );
+      } else {
+        console.error(
+          '[contact/intake] SMTP authentication failed (535). Check SMTP_USER / SMTP_PASSWORD and EMAIL_FROM; for M365 ensure SMTP AUTH is enabled — docs-archive/EMAIL_SETUP.md'
+        );
+      }
     }
     if (err.code === 'EMAIL_TRANSPORT_NOT_CONFIGURED') {
       console.error('[contact/intake] No email transport (missing Gmail/SMTP or SMTP_PASSWORD still a placeholder).');
